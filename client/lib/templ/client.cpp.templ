@@ -1,0 +1,751 @@
+//
+// Copyright 2024 - 2024 (C). Alex Robenko. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "##NAME##client.h"
+#include "ClientAllocator.h"
+#include "ExtConfig.h"
+
+#include "comms/util/ScopeGuard.h"
+
+struct CC_Mqtt311Client {};
+struct CC_Mqtt311Connect {};
+struct CC_Mqtt311Disconnect {};
+struct CC_Mqtt311Subscribe {};
+struct CC_Mqtt311Unsubscribe {};
+//struct CC_Mqtt311Publish {};
+
+namespace
+{
+
+cc_mqtt311_client::ClientAllocator& getClientAllocator()
+{
+    static cc_mqtt311_client::ClientAllocator Allocator;
+    return Allocator;
+}
+
+inline cc_mqtt311_client::ClientImpl* clientFromHandle(CC_Mqtt311ClientHandle handle)
+{
+    return reinterpret_cast<cc_mqtt311_client::ClientImpl*>(handle);
+}
+
+inline CC_Mqtt311ClientHandle handleFromClient(cc_mqtt311_client::ClientImpl* client)
+{
+    return reinterpret_cast<CC_Mqtt311ClientHandle>(client);
+}
+
+inline cc_mqtt311_client::op::ConnectOp* connectOpFromHandle(CC_Mqtt311ConnectHandle handle)
+{
+    return reinterpret_cast<cc_mqtt311_client::op::ConnectOp*>(handle);
+}
+
+inline CC_Mqtt311ConnectHandle handleFromConnectOp(cc_mqtt311_client::op::ConnectOp* op)
+{
+    return reinterpret_cast<CC_Mqtt311ConnectHandle>(op);
+}
+
+inline cc_mqtt311_client::op::DisconnectOp* disconnectOpFromHandle(CC_Mqtt311DisconnectHandle handle)
+{
+    return reinterpret_cast<cc_mqtt311_client::op::DisconnectOp*>(handle);
+}
+
+inline CC_Mqtt311DisconnectHandle handleFromDisconnectOp(cc_mqtt311_client::op::DisconnectOp* op)
+{
+    return reinterpret_cast<CC_Mqtt311DisconnectHandle>(op);
+}
+
+inline cc_mqtt311_client::op::SubscribeOp* subscribeOpFromHandle(CC_Mqtt311SubscribeHandle handle)
+{
+    return cc_mqtt311_client::op::SubscribeOp::fromHandle(handle);
+}
+
+inline CC_Mqtt311SubscribeHandle handleFromSubscribeOp(cc_mqtt311_client::op::SubscribeOp* op)
+{
+    return cc_mqtt311_client::op::SubscribeOp::asHandle(op);
+}
+
+inline cc_mqtt311_client::op::UnsubscribeOp* unsubscribeOpFromHandle(CC_Mqtt311UnsubscribeHandle handle)
+{
+    return cc_mqtt311_client::op::UnsubscribeOp::fromHandle(handle);
+}
+
+inline CC_Mqtt311UnsubscribeHandle handleFromUnsubscribeOp(cc_mqtt311_client::op::UnsubscribeOp* op)
+{
+    return cc_mqtt311_client::op::UnsubscribeOp::asHandle(op);
+}
+
+inline cc_mqtt311_client::op::SendOp* sendOpFromHandle(CC_Mqtt311PublishHandle handle)
+{
+    return reinterpret_cast<cc_mqtt311_client::op::SendOp*>(handle);
+}
+
+inline CC_Mqtt311PublishHandle handleFromSendOp(cc_mqtt311_client::op::SendOp* op)
+{
+    return reinterpret_cast<CC_Mqtt311PublishHandle>(op);
+}
+
+} // namespace
+
+CC_Mqtt311ClientHandle cc_mqtt311_##NAME##client_alloc()
+{
+    auto client = getClientAllocator().alloc();
+    return handleFromClient(client.release());    
+}
+
+void cc_mqtt311_##NAME##client_free(CC_Mqtt311ClientHandle handle)
+{
+    getClientAllocator().free(clientFromHandle(handle));
+}
+
+void cc_mqtt311_##NAME##client_tick(CC_Mqtt311ClientHandle handle, unsigned ms)
+{
+    clientFromHandle(handle)->tick(ms);
+}
+
+unsigned cc_mqtt311_##NAME##client_process_data(CC_Mqtt311ClientHandle handle, const unsigned char* buf, unsigned bufLen)
+{
+    COMMS_ASSERT(handle != nullptr);
+    return clientFromHandle(handle)->processData(buf, bufLen);
+}
+
+void cc_mqtt311_##NAME##client_notify_network_disconnected(CC_Mqtt311ClientHandle handle)
+{
+    COMMS_ASSERT(handle != nullptr);
+    clientFromHandle(handle)->notifyNetworkDisconnected();
+}
+
+bool cc_mqtt311_##NAME##client_is_network_disconnected(CC_Mqtt311ClientHandle handle)
+{
+    COMMS_ASSERT(handle != nullptr);
+    return clientFromHandle(handle)->isNetworkDisconnected();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_default_response_timeout(CC_Mqtt311ClientHandle handle, unsigned ms)
+{
+    if ((handle == nullptr) || (ms == 0U)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    clientFromHandle(handle)->configState().m_responseTimeoutMs = ms;
+    return CC_Mqtt311ErrorCode_Success;
+}
+
+unsigned cc_mqtt311_##NAME##client_get_default_response_timeout(CC_Mqtt311ClientHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return clientFromHandle(handle)->configState().m_responseTimeoutMs;
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_outgoing_topic_enabled(CC_Mqtt311ClientHandle handle, bool enabled)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }  
+
+    if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
+        clientFromHandle(handle)->configState().m_verifyOutgoingTopic = enabled;
+        return CC_Mqtt311ErrorCode_Success;
+    }
+    else {
+        return CC_Mqtt311ErrorCode_NotSupported;
+    }
+}
+
+bool cc_mqtt311_##NAME##client_get_verify_outgoing_topic_enabled(CC_Mqtt311ClientHandle handle)
+{
+    if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
+        COMMS_ASSERT(handle != nullptr);
+        return clientFromHandle(handle)->configState().m_verifyOutgoingTopic;
+    }
+    else {
+        return false;
+    }
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_topic_enabled(CC_Mqtt311ClientHandle handle, bool enabled)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }  
+
+    if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
+        clientFromHandle(handle)->configState().m_verifyIncomingTopic = enabled;
+        return CC_Mqtt311ErrorCode_Success;
+    }
+    else {
+        return CC_Mqtt311ErrorCode_NotSupported;
+    }
+}
+
+bool cc_mqtt311_##NAME##client_get_verify_incoming_topic_enabled(CC_Mqtt311ClientHandle handle)
+{
+    if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
+        COMMS_ASSERT(handle != nullptr);
+        return clientFromHandle(handle)->configState().m_verifyIncomingTopic;
+    }
+    else {
+        return false;
+    }
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_msg_subscribed(CC_Mqtt311ClientHandle handle, bool enabled)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }  
+
+    if constexpr (cc_mqtt311_client::Config::HasSubTopicVerification) {
+        clientFromHandle(handle)->configState().m_verifySubFilter = enabled;
+        return CC_Mqtt311ErrorCode_Success;
+    }
+    else {
+        return CC_Mqtt311ErrorCode_NotSupported;
+    }
+}
+
+bool cc_mqtt311_##NAME##client_get_verify_incoming_msg_subscribed(CC_Mqtt311ClientHandle handle)
+{
+    if constexpr (cc_mqtt311_client::Config::HasSubTopicVerification) {
+        COMMS_ASSERT(handle != nullptr);
+        return clientFromHandle(handle)->configState().m_verifySubFilter;
+    }
+    else {
+        return false;
+    }
+}
+
+CC_Mqtt311ConnectHandle cc_mqtt311_##NAME##client_connect_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
+{
+    if (handle == nullptr) {
+        if (ec != nullptr) {
+            *ec = CC_Mqtt311ErrorCode_BadParam;
+        }        
+        return nullptr;
+    }
+
+    return handleFromConnectOp(clientFromHandle(handle)->connectPrepare(ec));
+}
+
+void cc_mqtt311_##NAME##client_connect_init_config(CC_Mqtt311ConnectConfig* config)
+{
+    *config = CC_Mqtt311ConnectConfig();
+    config->m_keepAlive = cc_mqtt311_client::SessionState::DefaultKeepAlive;
+}
+
+void cc_mqtt311_##NAME##client_connect_init_config_will(CC_Mqtt311ConnectWillConfig* config)
+{
+    *config = CC_Mqtt311ConnectWillConfig();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_set_response_timeout(CC_Mqtt311ConnectHandle handle, unsigned ms)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    connectOpFromHandle(handle)->setResponseTimeout(ms);
+    return CC_Mqtt311ErrorCode_Success;
+}
+
+unsigned cc_mqtt311_##NAME##client_connect_get_response_timeout(CC_Mqtt311ConnectHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return connectOpFromHandle(handle)->getResponseTimeout();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config(CC_Mqtt311ConnectHandle handle, const CC_Mqtt311ConnectConfig* config)
+{
+    if ((handle == nullptr) || (config == nullptr)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return connectOpFromHandle(handle)->config(*config);
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config_will(CC_Mqtt311ConnectHandle handle, const CC_Mqtt311ConnectWillConfig* config)
+{
+    if ((handle == nullptr) || (config == nullptr)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return connectOpFromHandle(handle)->configWill(*config);
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_send(CC_Mqtt311ConnectHandle handle, CC_Mqtt311ConnectCompleteCb cb, void* cbData)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return connectOpFromHandle(handle)->send(cb, cbData);
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_cancel(CC_Mqtt311ConnectHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return connectOpFromHandle(handle)->cancel();       
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311ConnectConfig* config,
+    const CC_Mqtt311ConnectWillConfig* willConfig,
+    CC_Mqtt311ConnectCompleteCb cb, 
+    void* cbData)
+{
+    auto ec = CC_Mqtt311ErrorCode_Success;
+    auto connect = cc_mqtt311_##NAME##client_connect_prepare(handle, &ec);
+    if (connect == nullptr) {
+        return ec;
+    }
+
+    auto cancelOnExitGuard = 
+        comms::util::makeScopeGuard(
+            [connect]()
+            {
+                [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_connect_cancel(connect);
+            });    
+
+    if (config != nullptr) {
+        ec = cc_mqtt311_##NAME##client_connect_config(connect, config);
+        if (ec != CC_Mqtt311ErrorCode_Success) {
+            return ec;
+        }
+    }
+
+    if (willConfig != nullptr) {
+        ec = cc_mqtt311_##NAME##client_connect_config_will(connect, willConfig);
+        if (ec != CC_Mqtt311ErrorCode_Success) {
+            return ec;
+        }        
+    }
+
+    cancelOnExitGuard.release();
+    return cc_mqtt311_##NAME##client_connect_send(connect, cb, cbData);
+}
+
+bool cc_mqtt311_##NAME##client_is_connected(CC_Mqtt311ClientHandle handle)
+{
+    if (handle == nullptr) {
+        return false;
+    }
+
+    return clientFromHandle(handle)->sessionState().m_connected;
+}
+
+CC_Mqtt311DisconnectHandle cc_mqtt311_##NAME##client_disconnect_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
+{
+    if (handle == nullptr) {
+        if (ec != nullptr) {
+            *ec = CC_Mqtt311ErrorCode_BadParam;
+        }        
+        return nullptr;
+    }
+
+    return handleFromDisconnectOp(clientFromHandle(handle)->disconnectPrepare(ec));    
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_send(CC_Mqtt311DisconnectHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }  
+
+    return disconnectOpFromHandle(handle)->send();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_cancel(CC_Mqtt311DisconnectHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return disconnectOpFromHandle(handle)->cancel();       
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect(CC_Mqtt311ClientHandle handle)
+{
+    auto ec = CC_Mqtt311ErrorCode_Success;
+    auto disconnect = cc_mqtt311_##NAME##client_disconnect_prepare(handle, &ec);
+    if (disconnect == nullptr) {
+        return ec;
+    }
+
+    return cc_mqtt311_##NAME##client_disconnect_send(disconnect);    
+}
+
+CC_Mqtt311SubscribeHandle cc_mqtt311_##NAME##client_subscribe_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
+{
+    if (handle == nullptr) {
+        if (ec != nullptr) {
+            *ec = CC_Mqtt311ErrorCode_BadParam;
+        }        
+        return nullptr;
+    }
+
+    return handleFromSubscribeOp(clientFromHandle(handle)->subscribePrepare(ec));    
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_set_response_timeout(CC_Mqtt311SubscribeHandle handle, unsigned ms)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    subscribeOpFromHandle(handle)->setResponseTimeout(ms);
+    return CC_Mqtt311ErrorCode_Success;
+}
+
+unsigned cc_mqtt311_##NAME##client_subscribe_get_response_timeout(CC_Mqtt311SubscribeHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return subscribeOpFromHandle(handle)->getResponseTimeout();
+}
+
+void cc_mqtt311_##NAME##client_subscribe_init_config_topic(CC_Mqtt311SubscribeTopicConfig* config)
+{
+    *config = CC_Mqtt311SubscribeTopicConfig();
+    config->m_maxQos = CC_Mqtt311QoS_ExactlyOnceDelivery;
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_config_topic(CC_Mqtt311SubscribeHandle handle, const CC_Mqtt311SubscribeTopicConfig* config)
+{
+    if ((handle == nullptr) || (config == nullptr)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return subscribeOpFromHandle(handle)->configTopic(*config);
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_send(CC_Mqtt311SubscribeHandle handle, CC_Mqtt311SubscribeCompleteCb cb, void* cbData)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return subscribeOpFromHandle(handle)->send(cb, cbData);    
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_cancel(CC_Mqtt311SubscribeHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return subscribeOpFromHandle(handle)->cancel();       
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311SubscribeTopicConfig* topicConfigs,
+    unsigned topicConfigsCount,
+    CC_Mqtt311SubscribeCompleteCb cb, 
+    void* cbData)
+{
+    auto ec = CC_Mqtt311ErrorCode_Success;
+    auto subscribe = cc_mqtt311_##NAME##client_subscribe_prepare(handle, &ec);
+    if (subscribe == nullptr) {
+        return ec;
+    }
+
+    auto cancelOnExitGuard = 
+        comms::util::makeScopeGuard(
+            [subscribe]()
+            {
+                [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_subscribe_cancel(subscribe);
+            });  
+
+    COMMS_ASSERT((topicConfigsCount == 0U) || (topicConfigs != nullptr));
+    for (auto idx = 0U; idx < topicConfigsCount; ++idx) {
+        auto& config = topicConfigs[idx];
+        ec = cc_mqtt311_##NAME##client_subscribe_config_topic(subscribe, &config);
+        if (ec != CC_Mqtt311ErrorCode_Success) {
+            return ec;
+        }
+    }
+
+    cancelOnExitGuard.release();
+    return cc_mqtt311_##NAME##client_subscribe_send(subscribe, cb, cbData);
+}
+
+CC_Mqtt311UnsubscribeHandle cc_mqtt311_##NAME##client_unsubscribe_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
+{
+    if (handle == nullptr) {
+        if (ec != nullptr) {
+            *ec = CC_Mqtt311ErrorCode_BadParam;
+        }        
+        return nullptr;
+    }
+
+    return handleFromUnsubscribeOp(clientFromHandle(handle)->unsubscribePrepare(ec)); 
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_set_response_timeout(CC_Mqtt311UnsubscribeHandle handle, unsigned ms)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    unsubscribeOpFromHandle(handle)->setResponseTimeout(ms);
+    return CC_Mqtt311ErrorCode_Success;    
+}
+
+unsigned cc_mqtt311_##NAME##client_unsubscribe_get_response_timeout(CC_Mqtt311UnsubscribeHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return unsubscribeOpFromHandle(handle)->getResponseTimeout();
+}
+
+void cc_mqtt311_##NAME##client_unsubscribe_init_config_topic(CC_Mqtt311UnsubscribeTopicConfig* config)
+{
+    *config = CC_Mqtt311UnsubscribeTopicConfig();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_config_topic(CC_Mqtt311UnsubscribeHandle handle, const CC_Mqtt311UnsubscribeTopicConfig* config)
+{
+    if ((handle == nullptr) || (config == nullptr)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return unsubscribeOpFromHandle(handle)->configTopic(*config);    
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_send(CC_Mqtt311UnsubscribeHandle handle, CC_Mqtt311UnsubscribeCompleteCb cb, void* cbData)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return unsubscribeOpFromHandle(handle)->send(cb, cbData);      
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_cancel(CC_Mqtt311UnsubscribeHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return unsubscribeOpFromHandle(handle)->cancel();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311UnsubscribeTopicConfig* topicConfigs,
+    unsigned topicConfigsCount,
+    CC_Mqtt311UnsubscribeCompleteCb cb, 
+    void* cbData)
+{
+    auto ec = CC_Mqtt311ErrorCode_Success;
+    auto unsubscribe = cc_mqtt311_##NAME##client_unsubscribe_prepare(handle, &ec);
+    if (unsubscribe == nullptr) {
+        return ec;
+    }
+
+    auto cancelOnExitGuard = 
+        comms::util::makeScopeGuard(
+            [unsubscribe]()
+            {
+                [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_unsubscribe_cancel(unsubscribe);
+            });  
+
+    COMMS_ASSERT((topicConfigsCount == 0U) || (topicConfigs != nullptr));
+    for (auto idx = 0U; idx < topicConfigsCount; ++idx) {
+        auto& config = topicConfigs[idx];
+        ec = cc_mqtt311_##NAME##client_unsubscribe_config_topic(unsubscribe, &config);
+        if (ec != CC_Mqtt311ErrorCode_Success) {
+            return ec;
+        }
+    }
+
+    cancelOnExitGuard.release();
+    return cc_mqtt311_##NAME##client_unsubscribe_send(unsubscribe, cb, cbData);
+}
+
+CC_Mqtt311PublishHandle cc_mqtt311_##NAME##client_publish_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
+{
+    if (handle == nullptr) {
+        if (ec != nullptr) {
+            *ec = CC_Mqtt311ErrorCode_BadParam;
+        }        
+        return nullptr;
+    }
+
+    return handleFromSendOp(clientFromHandle(handle)->publishPrepare(ec));     
+}
+
+unsigned cc_mqtt311_##NAME##client_publish_count(CC_Mqtt311ClientHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }    
+
+    return static_cast<unsigned>(clientFromHandle(handle)->sendsCount());
+}
+
+void cc_mqtt311_##NAME##client_publish_init_config(CC_Mqtt311PublishConfig* config)
+{
+    *config = CC_Mqtt311PublishConfig();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_response_timeout(CC_Mqtt311PublishHandle handle, unsigned ms)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    sendOpFromHandle(handle)->setResponseTimeout(ms);
+    return CC_Mqtt311ErrorCode_Success;       
+}
+
+unsigned cc_mqtt311_##NAME##client_publish_get_response_timeout(CC_Mqtt311PublishHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return sendOpFromHandle(handle)->getResponseTimeout();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_resend_attempts(CC_Mqtt311PublishHandle handle, unsigned attempts)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return sendOpFromHandle(handle)->setResendAttempts(attempts);
+}
+
+unsigned cc_mqtt311_##NAME##client_publish_get_resend_attempts(CC_Mqtt311PublishHandle handle)
+{
+    if (handle == nullptr) {
+        return 0U;
+    }
+
+    return sendOpFromHandle(handle)->getResendAttempts();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_config(CC_Mqtt311PublishHandle handle, const CC_Mqtt311PublishConfig* config)
+{
+    if ((handle == nullptr) || (config == nullptr)) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+    
+    return sendOpFromHandle(handle)->config(*config);
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_send(CC_Mqtt311PublishHandle handle, CC_Mqtt311PublishCompleteCb cb, void* cbData)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return sendOpFromHandle(handle)->send(cb, cbData);         
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_cancel(CC_Mqtt311PublishHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }    
+
+    return sendOpFromHandle(handle)->cancel();
+}
+
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311PublishConfig* config,
+    CC_Mqtt311PublishCompleteCb cb, 
+    void* cbData)
+{
+    auto ec = CC_Mqtt311ErrorCode_Success;
+    auto publish = cc_mqtt311_##NAME##client_publish_prepare(handle, &ec);
+    if (publish == nullptr) {
+        return ec;
+    }
+
+    auto cancelOnExitGuard = 
+        comms::util::makeScopeGuard(
+            [publish]()
+            {
+                [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_publish_cancel(publish);
+            });  
+
+    if (config != nullptr) {
+        ec = cc_mqtt311_##NAME##client_publish_config(publish, config);
+        if (ec != CC_Mqtt311ErrorCode_Success) {
+            return ec;
+        }        
+    }
+
+    cancelOnExitGuard.release();
+    return cc_mqtt311_##NAME##client_publish_send(publish, cb, cbData);    
+}
+
+// --------------------- Callbacks ---------------------
+
+void cc_mqtt311_##NAME##client_set_next_tick_program_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311NextTickProgramCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setNextTickProgramCallback(cb, data);
+}
+
+void cc_mqtt311_##NAME##client_set_cancel_next_tick_wait_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311CancelNextTickWaitCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setCancelNextTickWaitCallback(cb, data);
+}
+
+void cc_mqtt311_##NAME##client_set_send_output_data_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311SendOutputDataCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setSendOutputDataCallback(cb, data);
+}
+
+void cc_mqtt311_##NAME##client_set_broker_disconnect_report_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311BrokerDisconnectReportCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setBrokerDisconnectReportCallback(cb, data);
+}
+
+void cc_mqtt311_##NAME##client_set_message_received_report_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311MessageReceivedReportCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setMessageReceivedCallback(cb, data);
+}
+
+void cc_mqtt311_##NAME##client_set_error_log_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311ErrorLogCb cb,
+    void* data)
+{
+    clientFromHandle(handle)->setErrorLogCallback(cb, data);
+}
+

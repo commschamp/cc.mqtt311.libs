@@ -1,0 +1,606 @@
+//
+// Copyright 2024 - 2024 (C). Alex Robenko. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+/// @file
+/// @brief Functions of the CommsChampion MQTT v3.1.1 client library.
+
+#pragma once
+
+#include "cc_mqtt311_client/common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif // #ifdef __cplusplus
+
+/// @defgroup global "Global Data Types and Functions"
+/// @defgroup client "Client Data Types and Functions"
+/// @defgroup connect "Connect Operation Data Type and Functions"
+/// @defgroup disconnect "Disconnect Operation Data Type and Functions"
+/// @defgroup subscribe "Subscribe Operation Data Type and Functions"
+/// @defgroup unsubscribe "Unsubscribe Operation Data Type and Functions"
+/// @defgroup publish "Publish Operation Data Type and Functions"
+/// @defgroup reauth "Re-authenticate Operation Data Type and Functions"
+
+/// @brief Allocate new client.
+/// @details When work with the client is complete, @ref cc_mqtt311_##NAME##client_free()
+///     function must be invoked.
+/// @return Handle to allocated client object. This handle needs to be passed
+///     as first parameter to all other API functions.
+/// @ingroup client
+CC_Mqtt311ClientHandle cc_mqtt311_##NAME##client_alloc();
+
+/// @brief Free previously allocated client.
+/// @details The callbacks of the incomplete operations will be invoked with 
+///     @ref CC_Mqtt311AsyncOpStatus_Aborted status.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @pre Mustn't be called from within a callback, use next event loop iteration.
+/// @post The client handler becomes invalid and cannot be used any longer.
+/// @ingroup client
+void cc_mqtt311_##NAME##client_free(CC_Mqtt311ClientHandle handle);
+
+/// @brief Notify client about requested time expiry.
+/// @details The reported amount of milliseconds needs to be from the 
+///     last request to program timer via callback (set by
+///     cc_mqtt311_##NAME##client_set_next_tick_program_callback()).
+///     It can be less than actually requested via the callback. If this
+///     function is called, the library assumes that previously requested
+///     timeout measurement is not in progress any more, and will request
+///     new measurement if needed.
+///     This call may cause invocation of some other callbacks, such as a request
+///     to send new data to the broker.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] ms Number of elapsed @b milliseconds.
+/// @ingroup client
+void cc_mqtt311_##NAME##client_tick(CC_Mqtt311ClientHandle handle, unsigned ms);
+
+/// @brief Provide data (received over I/O link), to the library for processing.
+/// @details This call may cause invocation of some callbacks, such as 
+///     request to cancel the currently running time measurement, send some messages to
+///     the broker, report incoming application message, and (re)start time
+///     measurement.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] buf Pointer to the buffer of data to process.
+/// @param[in] bufLen Number of bytes in the data buffer.
+/// @return Number of processed bytes.
+/// @note The function returns number of bytes that were actually consumed, and
+///     can be removed from the holding buffer.
+/// @ingroup client
+unsigned cc_mqtt311_##NAME##client_process_data(CC_Mqtt311ClientHandle handle, const unsigned char* buf, unsigned bufLen);
+
+/// @brief Report network disconnected
+/// @details To notify the client that the network is connected again use 
+///     @ref cc_mqtt311_##NAME##client_connect_prepare()
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @ingroup client
+void cc_mqtt311_##NAME##client_notify_network_disconnected(CC_Mqtt311ClientHandle handle);
+
+/// @brief Check current network disconnected status
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return @b true when disconnected, @b false when0 connected.
+/// @note After invocation of the @ref cc_mqtt311_##NAME##client_alloc(), this function will return @b false, i.e.
+/// after client allocation network is assumend connected.
+/// @ingroup client
+bool cc_mqtt311_##NAME##client_is_network_disconnected(CC_Mqtt311ClientHandle handle);
+
+/// @brief Configure default response timeout period
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] ms Response timeout duration in @b milliseconds.
+/// @return Error code of the operation
+/// @ingroup client
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_default_response_timeout(CC_Mqtt311ClientHandle handle, unsigned ms);
+
+/// @brief Retrieved currently configured default response timeout period
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return Response timeout duration in @b milliseconds.
+/// @ingroup client
+unsigned cc_mqtt311_##NAME##client_get_default_response_timeout(CC_Mqtt311ClientHandle handle);
+
+/// @brief Control outgoing topic format verification
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] enabled @b true to enable topic format verification, @b false to disable.
+/// @return Error code of the operation
+/// @ingroup client
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_outgoing_topic_enabled(CC_Mqtt311ClientHandle handle, bool enabled);
+
+/// @brief Retrieve current outgoing topic format verification control
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return @b true when enabled, @b false when disabled
+/// @ingroup client
+bool cc_mqtt311_##NAME##client_get_verify_outgoing_topic_enabled(CC_Mqtt311ClientHandle handle);
+
+/// @brief Control incoming topic format verification
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] enabled @b true to enable topic format verification, @b false to disable.
+/// @return Error code of the operation
+/// @ingroup client
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_topic_enabled(CC_Mqtt311ClientHandle handle, bool enabled);
+
+/// @brief Retrieve current incoming topic format verification control
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return @b true when enabled, @b false when disabled
+/// @ingroup client
+bool cc_mqtt311_##NAME##client_get_verify_incoming_topic_enabled(CC_Mqtt311ClientHandle handle);
+
+/// @brief Control verification of the incoming message being correctly subscribed.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] enabled @b true to enable topic format verification, @b false to disable.
+/// @return Error code of the operation
+/// @ingroup client
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_msg_subscribed(CC_Mqtt311ClientHandle handle, bool enabled);
+
+/// @brief Retrieve current incoming message being correctly subscribed control.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return @b true when enabled, @b false when disabled
+/// @ingroup client
+bool cc_mqtt311_##NAME##client_get_verify_incoming_msg_subscribed(CC_Mqtt311ClientHandle handle);
+
+/// @brief Prepare "connect" operation.
+/// @details For successful operation the client needs to be in the "disconnected" state and 
+///     there are no other incomplete "connect" operation
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[out] ec Error code reporting result of the operation. Can be NULL.
+/// @return Handle of the "connect" operation, will be NULL in case of failure. To analyze the reason failure use "ec" output parameter.
+/// @pre The function can NOT be called from within a callback, use next event iteration.
+/// @post The network assumed to be in the "connected" state, use @ref cc_mqtt311_##NAME##client_is_network_disconnected()
+///     to notify about the network disconnection.
+/// @post The "connect" operation is allocated, use either @ref cc_mqtt311_##NAME##client_connect_send()
+///     or @ref cc_mqtt311_##NAME##client_connect_cancel() to prevent memory leaks.
+/// @ingroup connect
+CC_Mqtt311ConnectHandle cc_mqtt311_##NAME##client_connect_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec);
+
+/// @brief Intialize the @ref CC_Mqtt311ConnectConfig configuration structure.
+/// @param[out] config Configuration structure. Must not be NULL.
+/// @ingroup connect
+void cc_mqtt311_##NAME##client_connect_init_config(CC_Mqtt311ConnectConfig* config);
+
+/// @brief Intialize the @ref CC_Mqtt311ConnectWillConfig configuration structure.
+/// @param[out] config Configuration structure. Must not be NULL.
+/// @ingroup connect
+void cc_mqtt311_##NAME##client_connect_init_config_will(CC_Mqtt311ConnectWillConfig* config);
+
+/// @brief Configure the broker response timeout for the "connect" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @param[in] ms Response timeout duration in @b milliseconds.
+/// @return Result code of the call.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_set_response_timeout(CC_Mqtt311ConnectHandle handle, unsigned ms);
+
+/// @brief Retrieve the configured the broker response timeout for the "connect" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @return Response timeout duration in @b milliseconds.
+/// @ingroup connect
+unsigned cc_mqtt311_##NAME##client_connect_get_response_timeout(CC_Mqtt311ConnectHandle handle);
+
+/// @brief Perform basic configuration of the "connect" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @param[in] config Configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
+/// @return Result code of the call.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config(CC_Mqtt311ConnectHandle handle, const CC_Mqtt311ConnectConfig* config);
+
+/// @brief Perform will configuration of the "connect" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @param[in] config Will configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
+/// @return Result code of the call.
+/// @pre Mustn't be called more than once for a single "connect" operation.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config_will(CC_Mqtt311ConnectHandle handle, const CC_Mqtt311ConnectWillConfig* config);
+
+/// @brief Send the configured "connect" operation to broker
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @param[in] cb Callback to be invoked when "connect" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @post The handle of the "connect" operation can be discarded.
+/// @post The provided callback will be invoked when the "connect" operation is complete <b> if and only if</b>
+///     the function returns @ref CC_Mqtt311ErrorCode_Success.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_send(CC_Mqtt311ConnectHandle handle, CC_Mqtt311ConnectCompleteCb cb, void* cbData);
+
+/// @brief Cancel the allocated "connect" operation
+/// @details In case the @ref cc_mqtt311_##NAME##client_connect_send() function was successfully called before,
+///     the operation is cancelled @b without callback invocation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "connect" operation is no longer valid and must be discarded.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_cancel(CC_Mqtt311ConnectHandle handle);
+
+/// @brief Prepare, configure, and send "connect" request in one go 
+/// @details Abstracts away sequence of the following functions invocation:
+///     @li @ref cc_mqtt311_##NAME##client_connect_prepare()
+///     @li @ref cc_mqtt311_##NAME##client_connect_config()
+///     @li @ref cc_mqtt311_##NAME##client_connect_config_will()
+///     @li @ref cc_mqtt311_##NAME##client_connect_send()
+///
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] config Connection configuration. Can be NULL.
+/// @param[in] willConfig Will configuration. Can be NULL.
+/// @param[in] cb Callback to be invoked when "connect" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @ingroup connect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311ConnectConfig* config,
+    const CC_Mqtt311ConnectWillConfig* willConfig,
+    CC_Mqtt311ConnectCompleteCb cb, 
+    void* cbData);    
+
+/// @brief Check the inner state of the library of whether it's connected to the broker.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @ingroup connect
+bool cc_mqtt311_##NAME##client_is_connected(CC_Mqtt311ClientHandle handle);
+
+/// @brief Prepare "disconnect" operation.
+/// @details For successful operation the client needs to be in the "connected" state and 
+///     there were no other prepared or complete "disconnect" operation since last "connect" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[out] ec Error code reporting result of the operation. Can be NULL.
+/// @return Handle of the "disconnect" operation, will be NULL in case of failure. To analyze the reason failure use "ec" output parameter.
+/// @post The "disconnect" operation is allocated, use either @ref cc_mqtt311_##NAME##client_disconnect_send()
+///     or @ref cc_mqtt311_##NAME##client_disconnect_cancel() to prevent memory leaks.
+/// @ingroup disconnect
+CC_Mqtt311DisconnectHandle cc_mqtt311_##NAME##client_disconnect_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec);
+
+/// @brief Send the configured "disconnect" operation to broker
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_disconnect_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "disconnect" operation is not longer valid and must be discarded.
+/// @ingroup disconnect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_send(CC_Mqtt311DisconnectHandle handle);
+
+/// @brief Cancel the allocated "disconnect" operation
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_disconnect_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "disconnect" operation is no longer valid and must be discarded.
+/// @ingroup disconnect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_cancel(CC_Mqtt311DisconnectHandle handle);
+
+/// @brief Prepare, and send "disconnect" request in one go.
+/// @details Abstracts away sequence of the following functions invocation:
+///     @li @ref cc_mqtt311_##NAME##client_disconnect_prepare()
+///     @li @ref cc_mqtt311_##NAME##client_disconnect_send()
+///
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return Result code of the call.
+/// @ingroup disconnect
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect(CC_Mqtt311ClientHandle handle);
+
+/// @brief Prepare "subscribe" operation.
+/// @details For successful operation the client needs to be in the "connected" state.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[out] ec Error code reporting result of the operation. Can be NULL.
+/// @return Handle of the "subscribe" operation, will be NULL in case of failure. To analyze the reason failure use "ec" output parameter.
+/// @post The "subscribe" operation is allocated, use either @ref cc_mqtt311_##NAME##client_subscribe_send()
+///     or @ref cc_mqtt311_##NAME##client_subscribe_cancel() to prevent memory leaks.
+/// @ingroup subscribe
+CC_Mqtt311SubscribeHandle cc_mqtt311_##NAME##client_subscribe_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec);
+
+/// @brief Configure the broker response timeout for the "subscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_subscribe_prepare() function.
+/// @param[in] ms Response timeout duration in @b milliseconds.
+/// @return Result code of the call.
+/// @ingroup subscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_set_response_timeout(CC_Mqtt311SubscribeHandle handle, unsigned ms);
+
+/// @brief Retrieve the configured the broker response timeout for the "subscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_subscribe_prepare() function.
+/// @return Response timeout duration in @b milliseconds.
+/// @ingroup subscribe
+unsigned cc_mqtt311_##NAME##client_subscribe_get_response_timeout(CC_Mqtt311SubscribeHandle handle);
+
+/// @brief Intialize the @ref CC_Mqtt311SubscribeTopicConfig configuration structure.
+/// @param[out] config Configuration structure. Must not be NULL.
+/// @ingroup subscribe
+void cc_mqtt311_##NAME##client_subscribe_init_config_topic(CC_Mqtt311SubscribeTopicConfig* config);
+
+/// @brief Add topic configuration of the "subscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_subscribe_prepare() function.
+/// @param[in] config Topic configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
+/// @return Result code of the call.
+/// @ingroup subscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_config_topic(CC_Mqtt311SubscribeHandle handle, const CC_Mqtt311SubscribeTopicConfig* config);
+
+/// @brief Send the configured "subscribe" operation to broker
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_subscribe_prepare() function.
+/// @param[in] cb Callback to be invoked when "subscribe" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @pre At least one topic has been configured using @ref cc_mqtt311_##NAME##client_subscribe_config_topic.
+/// @post The handle of the "subscribe" operation can be discarded.
+/// @post The provided callback will be invoked when the "subscribe" operation is complete <b> if and only if</b>
+///     the function returns @ref CC_Mqtt311ErrorCode_Success.
+/// @ingroup subscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_send(CC_Mqtt311SubscribeHandle handle, CC_Mqtt311SubscribeCompleteCb cb, void* cbData);
+
+/// @brief Cancel the allocated "subscribe" operation
+/// @details In case the @ref cc_mqtt311_##NAME##client_subscribe_send() function was successfully called before,
+///     the operation is cancelled @b without callback invocation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_subscribe_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "subscribe" operation is no longer valid and must be discarded.
+/// @ingroup subscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_cancel(CC_Mqtt311SubscribeHandle handle);
+
+/// @brief Prepare, configure, and send "subscribe" request in one go
+/// @details Abstracts away sequence of the following functions invocation:
+///     @li @ref cc_mqtt311_##NAME##client_subscribe_prepare()
+///     @li @ref cc_mqtt311_##NAME##client_subscribe_config_topic() (multiple times)
+///     @li @ref cc_mqtt311_##NAME##client_subscribe_send()
+///
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] topicConfigs Pointer to array of the topic configurations.
+/// @param[in] topicConfigsCount Amount of the topic configurations in the array.
+/// @param[in] cb Callback to be invoked when "subscribe" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @ingroup subscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_full(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311SubscribeTopicConfig* topicConfigs,
+    unsigned topicConfigsCount,
+    CC_Mqtt311SubscribeCompleteCb cb, 
+    void* cbData);  
+
+/// @brief Prepare "unsubscribe" operation.
+/// @details For successful operation the client needs to be in the "connected" state.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[out] ec Error code reporting result of the operation. Can be NULL.
+/// @return Handle of the "unsubscribe" operation, will be NULL in case of failure. To analyze the reason failure use "ec" output parameter.
+/// @post The "unsubscribe" operation is allocated, use either @ref cc_mqtt311_##NAME##client_unsubscribe_send()
+///     or @ref cc_mqtt311_##NAME##client_unsubscribe_cancel() to prevent memory leaks.
+/// @ingroup unsubscribe
+CC_Mqtt311UnsubscribeHandle cc_mqtt311_##NAME##client_unsubscribe_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec);
+
+/// @brief Configure the broker response timeout for the "unsubscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_unsubscribe_prepare() function.
+/// @param[in] ms Response timeout duration in @b milliseconds.
+/// @return Result code of the call.
+/// @ingroup unsubscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_set_response_timeout(CC_Mqtt311UnsubscribeHandle handle, unsigned ms);
+
+/// @brief Retrieve the configured the broker response timeout for the "unsubscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_unsubscribe_prepare() function.
+/// @return Response timeout duration in @b milliseconds.
+/// @ingroup unsubscribe
+unsigned cc_mqtt311_##NAME##client_unsubscribe_get_response_timeout(CC_Mqtt311UnsubscribeHandle handle);
+
+/// @brief Intialize the @ref CC_Mqtt311UnsubscribeTopicConfig configuration structure.
+/// @param[out] config Configuration structure. Must not be NULL.
+/// @ingroup unsubscribe
+void cc_mqtt311_##NAME##client_unsubscribe_init_config_topic(CC_Mqtt311UnsubscribeTopicConfig* config);
+
+/// @brief Add topic configuration of the "unsubscribe" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_unsubscribe_prepare() function.
+/// @param[in] config Topic configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
+/// @return Result code of the call.
+/// @ingroup unsubscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_config_topic(CC_Mqtt311UnsubscribeHandle handle, const CC_Mqtt311UnsubscribeTopicConfig* config);
+
+/// @brief Send the configured "unsubscribe" operation to broker
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_unsubscribe_prepare() function.
+/// @param[in] cb Callback to be invoked when "unsubscribe" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @pre At least one topic has been configured using @ref cc_mqtt311_##NAME##client_unsubscribe_config_topic.
+/// @post The handle of the "unsubscribe" operation can be discarded.
+/// @post The provided callback will be invoked when the "unsubscribe" operation is complete <b> if and only if</b>
+///     the function returns @ref CC_Mqtt311ErrorCode_Success.
+/// @ingroup unsubscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_send(CC_Mqtt311UnsubscribeHandle handle, CC_Mqtt311UnsubscribeCompleteCb cb, void* cbData);
+
+/// @brief Cancel the allocated "unsubscribe" operation
+/// @details In case the @ref cc_mqtt311_##NAME##client_unsubscribe_send() function was successfully called before,
+///     the operation is cancelled @b without callback invocation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_unsubscribe_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "unsubscribe" operation is no longer valid and must be discarded.
+/// @ingroup unsubscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_cancel(CC_Mqtt311UnsubscribeHandle handle);
+
+/// @brief Prepare, configure, and send "unsubscribe" request in one go
+/// @details Abstracts away sequence of the following functions invocation:
+///     @li @ref cc_mqtt311_##NAME##client_unsubscribe_prepare()
+///     @li @ref cc_mqtt311_##NAME##client_unsubscribe_config_topic() (multiple times)
+///     @li @ref cc_mqtt311_##NAME##client_unsubscribe_send()
+///
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] topicConfigs Pointer to array of the topic configurations.
+/// @param[in] topicConfigsCount Amount of the topic configurations in the array.
+/// @param[in] cb Callback to be invoked when "unsubscribe" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @ingroup unsubscribe
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_full(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311UnsubscribeTopicConfig* topicConfigs,
+    unsigned topicConfigsCount,
+    CC_Mqtt311UnsubscribeCompleteCb cb, 
+    void* cbData);  
+
+/// @brief Prepare "publish" operation.
+/// @details For successful operation the client needs to be in the "connected" state.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[out] ec Error code reporting result of the operation. Can be NULL.
+/// @return Handle of the "publish" operation, will be NULL in case of failure. To analyze the reason failure use "ec" output parameter.
+/// @post The "publish" operation is allocated, use either @ref cc_mqtt311_##NAME##client_publish_send()
+///     or @ref cc_mqtt311_##NAME##client_publish_cancel() to prevent memory leaks.
+/// @ingroup publish
+CC_Mqtt311PublishHandle cc_mqtt311_##NAME##client_publish_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec);
+
+/// @brief  Get amount incomplete "publish" operations
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @return Amount of publish operations that have been prepared before, and are still incomplete.
+/// @ingroup publish
+unsigned cc_mqtt311_##NAME##client_publish_count(CC_Mqtt311ClientHandle handle);
+
+/// @brief Intialize the @ref CC_Mqtt311PublishConfig configuration structure.
+/// @param[out] config Configuration structure. Must not be NULL.
+/// @ingroup publish
+void cc_mqtt311_##NAME##client_publish_init_config(CC_Mqtt311PublishConfig* config);
+
+/// @brief Configure the broker response timeout for the "publish" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @param[in] ms Response timeout duration in @b milliseconds.
+/// @return Result code of the call.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_response_timeout(CC_Mqtt311PublishHandle handle, unsigned ms);
+
+/// @brief Retrieve the configured the broker response timeout for the "publish" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @return Response timeout duration in @b milliseconds.
+/// @ingroup publish
+unsigned cc_mqtt311_##NAME##client_publish_get_response_timeout(CC_Mqtt311PublishHandle handle);
+
+/// @brief Configure the amount of attempts to resend "publish" operation until the acknowledgement is received.
+/// @details When resending a second and further time, the @b DUP flags is set in the @b PUBLISH message to indicate duplicate.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @param[in] attempts Amount of resend attempts.
+/// @return Result code of the call.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_resend_attempts(CC_Mqtt311PublishHandle handle, unsigned attempts);
+
+/// @brief Retrieve the configured the amount of resend attempts for the "publish" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @return Configured amount of resend attempts.
+/// @ingroup publish
+unsigned cc_mqtt311_##NAME##client_publish_get_resend_attempts(CC_Mqtt311PublishHandle handle);
+
+/// @brief Perform basic configuration of the "publish" operation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @param[in] config Basic configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
+/// @return Result code of the call.
+/// @post Some of the properties can get assigned regardless of the return value.
+/// @pre Mustn't be called more than once for a single "publish" operation when "topic alias" can be used.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_config(CC_Mqtt311PublishHandle handle, const CC_Mqtt311PublishConfig* config);
+
+/// @brief Send the configured "publish" operation to broker
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @param[in] cb Callback to be invoked when "publish" operation is complete, can be NULL.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. Can be NULL.
+/// @return Result code of the call.
+/// @post The handle of the "publish" operation can be discarded.
+/// @post The provided callback will be invoked when the "publish" operation is complete <b> if and only if</b>
+///     the function returns @ref CC_Mqtt311ErrorCode_Success.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_send(CC_Mqtt311PublishHandle handle, CC_Mqtt311PublishCompleteCb cb, void* cbData);
+
+/// @brief Cancel the allocated "publish" operation
+/// @details In case the @ref cc_mqtt311_##NAME##client_publish_send() function was successfully called before,
+///     the operation is cancelled @b without callback invocation.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @return Result code of the call.
+/// @post The handle of the "publish" operation is no longer valid and must be discarded.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_cancel(CC_Mqtt311PublishHandle handle);
+
+/// @brief Prepare, configure, and send "publish" request in one go
+/// @details Abstracts away sequence of the following functions invocation:
+///     @li @ref cc_mqtt311_##NAME##client_publish_prepare()
+///     @li @ref cc_mqtt311_##NAME##client_publish_config()
+///     @li @ref cc_mqtt311_##NAME##client_publish_send()
+///
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] config Publish configuration.
+/// @param[in] cb Callback to be invoked when "publish" operation is complete.
+/// @param[in] cbData Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+/// @return Result code of the call.
+/// @ingroup publish
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
+    CC_Mqtt311ClientHandle handle,
+    const CC_Mqtt311PublishConfig* config,
+    CC_Mqtt311PublishCompleteCb cb, 
+    void* cbData);
+
+
+// --------------------- Callbacks ---------------------
+
+/// @brief Set callback to call when time measurement is required.
+/// @details The MQTT311 client may require to measure time. When such 
+///     measurement is required, the provided callback will be invoked with
+///     the timeout duration in milliseconds. After requested time expires,
+///     the @ref cc_mqtt311_##NAME##client_tick() function must be invoked.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_next_tick_program_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311NextTickProgramCb cb,
+    void* data);
+    
+/// @brief Set callback to terminate current time measurement.
+/// @details The client may request termination of currently running time 
+///     measurement, previously requested via callback, which was set using
+///     @ref cc_mqtt311_##NAME##client_set_next_tick_program_callback() function. This function
+///     sets appropriate callback. When invoked, it must return number of
+///     elapsed milliseconds since previoius time measurement request.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_cancel_next_tick_wait_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311CancelNextTickWaitCb cb,
+    void* data);
+    
+/// @brief Set callback to send raw data over I/O link.
+/// @details The callback is invoked when there is a need to send data
+///     to the broker. The callback is invoked for every single message
+///     that need to be sent. 
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_send_output_data_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311SendOutputDataCb cb,
+    void* data);
+
+/// @brief Set callback to report unsolicited disconnection of the broker.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_broker_disconnect_report_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311BrokerDisconnectReportCb cb,
+    void* data);
+
+/// @brief Set callback to report received message from the broker.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_message_received_report_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311MessageReceivedReportCb cb,
+    void* data);
+
+/// @brief Set callback to report error messages.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_alloc() function.
+/// @param[in] cb Callback function.
+/// @param[in] data Pointer to any user data structure. It will passed as one 
+///     of the parameters in callback invocation. May be NULL.
+void cc_mqtt311_##NAME##client_set_error_log_callback(
+    CC_Mqtt311ClientHandle handle,
+    CC_Mqtt311ErrorLogCb cb,
+    void* data);
+
+#ifdef __cplusplus
+}
+#endif

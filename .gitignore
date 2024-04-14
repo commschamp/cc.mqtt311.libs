@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Directories
+build*
+.vscode
+externals
+.project
+.cproject
+CMakeLists.txt.user*

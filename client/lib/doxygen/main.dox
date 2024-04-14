@@ -1,0 +1,9 @@
+/// @mainpage MQTT v3.1.1 Client Library
+/// @tableofcontents
+/// @section doc_cc_mqtt311_client_overview Overview
+/// The <b>MQTT v3.1.1 Client Library</b> from the <a href="https://commschamp.github.io/">CommsChampion Ecosystem</a>
+/// provides simple, asynchronous, non-blocking,
+/// and easy to use interface to operate MQTT v3.1.1 client. The library doesn't
+/// make any assumption on the system it is running on, as well as on the type
+/// of I/O link being used to communicate its data to the MQTT v3.1.1 capable broker.
+///
