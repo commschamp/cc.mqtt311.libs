@@ -7,7 +7,7 @@ option (CC_MQTT311_CLIENT_LIB_FORCE_PIC "Force Position Independent Code (PIC) w
 option (CC_MQTT311_CLIENT_APPS "Build and install client applications" ${CC_MQTT311_CLIENT_DEFAULT_LIB})
 option (CC_MQTT311_CLIENT_AFL_FUZZ "Build and install client AFL++ fuzzing application" OFF)
 option (CC_MQTT311_WARN_AS_ERR "Treat warning as error" ON)
-option (CC_MQTT311_USE_CCACHE "Use ccache on unix system" OFF)
+option (CC_MQTT311_USE_CCACHE "Use ccache" OFF)
 option (CC_MQTT311_BUILD_UNIT_TESTS "Build unit tests" OFF)
 option (CC_MQTT311_BUILD_INTEGRATION_TESTS "Build integration tests which require MQTT broker on local port 1883." OFF)
 option (CC_MQTT311_WITH_DEFAULT_SANITIZERS "Build with sanitizers" OFF)

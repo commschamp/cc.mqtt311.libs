@@ -98,10 +98,9 @@ typedef enum
 /// @ingroup global
 typedef enum
 {
-    CC_Mqtt311BrokerDisconnectReason_DisconnectMsg = 0, ///< The broker sent @b DISCONNECT message.
+    CC_Mqtt311BrokerDisconnectReason_NoBrokerResponse = 0, ///< No messages from the broker and no response to @b PINGREQ
     CC_Mqtt311BrokerDisconnectReason_InternalError = 1, ///< The library encountered internal error and there is a need to close network connection
-    CC_Mqtt311BrokerDisconnectReason_NoBrokerResponse = 2, ///< No messages from the broker and no response to @b PINGREQ
-    CC_Mqtt311BrokerDisconnectReason_ProtocolError = 3, ///< Protocol error was detected.
+    CC_Mqtt311BrokerDisconnectReason_ProtocolError = 2, ///< Protocol error was detected.
     CC_Mqtt311BrokerDisconnectReason_ValuesLimit ///< Limit for the values
 } CC_Mqtt311BrokerDisconnectReason;
 
@@ -127,57 +126,6 @@ typedef enum
     CC_Mqtt311SubscribeReturnCode_SuccessQos2 = 0x02, ///< value <b>Maximum QoS 2</b>. 
     CC_Mqtt311SubscribeReturnCode_Failure = 0x80, ///< value <b>Failure</b>. 
 } CC_Mqtt311SubscribeReturnCode;
-
-/// @brief "Reason Code" as defined in MQTT311 specification
-/// @ingroup global
-typedef enum
-{
-    CC_Mqtt311ReasonCode_Success = 0, ///< value @b Success. 
-    CC_Mqtt311ReasonCode_NormalDisconnection = 0, ///< value <b>Normal Disconnection</b>. 
-    CC_Mqtt311ReasonCode_GrantedQos0 = 0, ///< value <b>Granted QoS0</b>. 
-    CC_Mqtt311ReasonCode_GrantedQos1 = 1, ///< value <b>Granted QoS1</b>. 
-    CC_Mqtt311ReasonCode_GrantedQos2 = 2, ///< value <b>Granted QoS2</b>. 
-    CC_Mqtt311ReasonCode_DisconnectWithWill = 4, ///< value <b>Disconnect w/ Will</b>. 
-    CC_Mqtt311ReasonCode_NoMatchingSubscribers = 16, ///< value <b>No Matching Subscribers</b>. 
-    CC_Mqtt311ReasonCode_NoSubscriptionExisted = 17, ///< value <b>No Subscription Existed</b>. 
-    CC_Mqtt311ReasonCode_ContinueAuth = 24, ///< value <b>Continue authentication</b>. 
-    CC_Mqtt311ReasonCode_ReAuth = 25, ///< value <b>Re-authenticate</b>. 
-    CC_Mqtt311ReasonCode_UnspecifiedError = 128, ///< value <b>Unspecified error</b>. 
-    CC_Mqtt311ReasonCode_MalformedPacket = 129, ///< value <b>Malformed Packet</b>. 
-    CC_Mqtt311ReasonCode_ProtocolError = 130, ///< value <b>Protocol Error</b>. 
-    CC_Mqtt311ReasonCode_ImplSpecificError = 131, ///< value <b>Impl. Specific Error</b>. 
-    CC_Mqtt311ReasonCode_UnsupportedVersion = 132, ///< value <b>Unsupported Version</b>. 
-    CC_Mqtt311ReasonCode_ClientIdInvalid = 133, ///< value <b>Client ID Invalid</b>. 
-    CC_Mqtt311ReasonCode_BadUserPassword = 134, ///< value <b>Bad Username/Password</b>. 
-    CC_Mqtt311ReasonCode_NotAuthorized = 135, ///< value <b>Not authorized</b>. 
-    CC_Mqtt311ReasonCode_ServerUnavailable = 136, ///< value <b>Server unavailable</b>. 
-    CC_Mqtt311ReasonCode_ServerBusy = 137, ///< value <b>Server busy</b>. 
-    CC_Mqtt311ReasonCode_Banned = 138, ///< value @b Banned. 
-    CC_Mqtt311ReasonCode_ServerShuttingDown = 139, ///< value <b>Server shutting down</b>. 
-    CC_Mqtt311ReasonCode_BadAuthMethod = 140, ///< value <b>Bad auth method</b>. 
-    CC_Mqtt311ReasonCode_KeepAliveTimeout = 141, ///< value <b>Keep Alive timeout</b>. 
-    CC_Mqtt311ReasonCode_SessionTakenOver = 142, ///< value <b>Session taken over</b>. 
-    CC_Mqtt311ReasonCode_TopicFilterInvalid = 143, ///< value <b>Topic Filter invalid</b>. 
-    CC_Mqtt311ReasonCode_TopicNameInvalid = 144, ///< value <b>Topic Name invalid</b>. 
-    CC_Mqtt311ReasonCode_PacketIdInUse = 145, ///< value <b>Packet ID in use</b>. 
-    CC_Mqtt311ReasonCode_PacketIdNotFound = 146, ///< value <b>Packet ID not found</b>. 
-    CC_Mqtt311ReasonCode_ReceiveMaxExceeded = 147, ///< value <b>Receive Max exceeded</b>. 
-    CC_Mqtt311ReasonCode_TopicAliasInvalid = 148, ///< value <b>Topic Alias invalid</b>. 
-    CC_Mqtt311ReasonCode_PacketTooLarge = 149, ///< value <b>Packet too large</b>. 
-    CC_Mqtt311ReasonCode_MsgRateTooHigh = 150, ///< value <b>Message rate too high</b>. 
-    CC_Mqtt311ReasonCode_QuotaExceeded = 151, ///< value <b>Quota exceeded</b>. 
-    CC_Mqtt311ReasonCode_AdministrativeAction = 152, ///< value <b>Administrative action</b>. 
-    CC_Mqtt311ReasonCode_PayloadFormatInvalid = 153, ///< value <b>Payload format invalid</b>. 
-    CC_Mqtt311ReasonCode_RetainNotSupported = 154, ///< value <b>Retain not supported</b>. 
-    CC_Mqtt311ReasonCode_QosNotSupported = 155, ///< value <b>QoS not supported</b>. 
-    CC_Mqtt311ReasonCode_UseAnotherServer = 156, ///< value <b>Use another server</b>. 
-    CC_Mqtt311ReasonCode_ServerMoved = 157, ///< value <b>Server moved</b>. 
-    CC_Mqtt311ReasonCode_SharedSubNotSuppored = 158, ///< value <b>Shared Sub not supported</b>. 
-    CC_Mqtt311ReasonCode_ConnectionRateExceeded = 159, ///< value <b>Connection rate exceeded</b>. 
-    CC_Mqtt311ReasonCode_MaxConnectTime = 160, ///< value <b>Maximum connect time</b>. 
-    CC_Mqtt311ReasonCode_SubIdsNotSupported = 161, ///< value <b>Sub IDs not supported</b>. 
-    CC_Mqtt311ReasonCode_WildcardSubsNotSupported = 162, ///< value <b>Wildcard Subs not supported</b>. 
-} CC_Mqtt311ReasonCode;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311ClientHandle
 /// @ingroup client
@@ -307,15 +255,6 @@ typedef struct
     const char* m_topic; ///< Topic used to publish the message
     const unsigned char* m_data; ///< Pointer to the temporary buffer containin message data
     unsigned m_dataLen; ///< Amount of data bytes 
-    const char* m_responseTopic; ///< "Response Topic" property when provided, NULL if not.
-    const unsigned char* m_correlationData; ///< Pointer to the "Correlation Data" property value when provided, NULL if not.
-    unsigned m_correlationDataLen; ///< Amount of "Correlation Data" bytes;
-    const CC_Mqtt311UserProp* m_userProps; ///< Pointer to the "User Property" properties array when provided, NULL if not.
-    unsigned m_userPropsCount; ///< Amount of "User Property" properties
-    const char* m_contentType; ///< "Content Type" property if provided, NULL if not.
-    const unsigned* m_subIds; ///< Pointer to array containing "Subscription Identifier" properties list when provided, NULL if not.
-    unsigned m_subIdsCount; ///< Amount of "Subscription Identifiers" in array.
-    unsigned m_messageExpiryInterval; ///< "Message Expiry Interval" property, defaults to 0 when not reported.
     CC_Mqtt311QoS m_qos; ///< QoS value used by the broker to report the message.
     bool m_retained; ///< Indication of whether the received message was "retained".
 } CC_Mqtt311MessageInfo;
@@ -369,6 +308,7 @@ typedef void (*CC_Mqtt311SendOutputDataCb)(void* data, const unsigned char* buf,
 /// @brief Callback used to report unsolicited disconnection of the broker.
 /// @param[in] data Pointer to user data object, passed as the last parameter to
 ///     the request call.
+/// @param[in] reason Reson for reporting unsolicited broker disconnection.
 /// @ingroup client
 typedef void (*CC_Mqtt311BrokerDisconnectReportCb)(void* data, CC_Mqtt311BrokerDisconnectReason reason);
 

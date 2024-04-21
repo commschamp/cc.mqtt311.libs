@@ -186,7 +186,6 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config(CC_Mqtt311ConnectHa
 /// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_connect_prepare() function.
 /// @param[in] config Will configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
 /// @return Result code of the call.
-/// @pre Mustn't be called more than once for a single "connect" operation.
 /// @ingroup connect
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config_will(CC_Mqtt311ConnectHandle handle, const CC_Mqtt311ConnectWillConfig* config);
 
@@ -344,7 +343,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_cancel(CC_Mqtt311Subscri
 ///     of the parameters in callback invocation. May be NULL.
 /// @return Result code of the call.
 /// @ingroup subscribe
-CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_full(
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311SubscribeTopicConfig* topicConfigs,
     unsigned topicConfigsCount,
@@ -422,7 +421,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_cancel(CC_Mqtt311Unsub
 ///     of the parameters in callback invocation. May be NULL.
 /// @return Result code of the call.
 /// @ingroup unsubscribe
-CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_full(
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311UnsubscribeTopicConfig* topicConfigs,
     unsigned topicConfigsCount,
@@ -482,7 +481,6 @@ unsigned cc_mqtt311_##NAME##client_publish_get_resend_attempts(CC_Mqtt311Publish
 /// @param[in] config Basic configuration structure. Must NOT be NULL. Does not need to be preserved after invocation.
 /// @return Result code of the call.
 /// @post Some of the properties can get assigned regardless of the return value.
-/// @pre Mustn't be called more than once for a single "publish" operation when "topic alias" can be used.
 /// @ingroup publish
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_config(CC_Mqtt311PublishHandle handle, const CC_Mqtt311PublishConfig* config);
 
