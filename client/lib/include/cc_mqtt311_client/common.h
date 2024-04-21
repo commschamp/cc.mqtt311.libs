@@ -85,6 +85,26 @@ typedef enum
     CC_Mqtt311AsyncOpStatus_ValuesLimit ///< Limit for the values
 } CC_Mqtt311AsyncOpStatus;
 
+/// @brief Publish ordering configuration
+/// @ingroup publish
+typedef enum
+{
+    CC_Mqtt311PublishOrdering_SameQos, ///< Preserve strict order only between same QoS messages.
+    CC_Mqtt311PublishOrdering_Full, ///< Preserve strict order between @b all messages.
+    CC_Mqtt311PublishOrdering_ValuesLimit ///< Limit for the values
+} CC_Mqtt311PublishOrdering;
+
+/// @brief Reason for reporting unsolicited broker disconnection
+/// @ingroup global
+typedef enum
+{
+    CC_Mqtt311BrokerDisconnectReason_DisconnectMsg = 0, ///< The broker sent @b DISCONNECT message.
+    CC_Mqtt311BrokerDisconnectReason_InternalError = 1, ///< The library encountered internal error and there is a need to close network connection
+    CC_Mqtt311BrokerDisconnectReason_NoBrokerResponse = 2, ///< No messages from the broker and no response to @b PINGREQ
+    CC_Mqtt311BrokerDisconnectReason_ProtocolError = 3, ///< Protocol error was detected.
+    CC_Mqtt311BrokerDisconnectReason_ValuesLimit ///< Limit for the values
+} CC_Mqtt311BrokerDisconnectReason;
+
 /// @brief "Connect Return Code" as defined in MQTT v3.1.1 specification
 /// @ingroup connect
 typedef enum

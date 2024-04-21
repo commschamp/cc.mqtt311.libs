@@ -57,12 +57,33 @@ public:
         return m_pubMsg.field_packetId().field().value();
     }
 
+    Qos qos() const 
+    {
+        return m_pubMsg.transportField_flags().field_qos().value();
+    }
+
     CC_Mqtt311ErrorCode config(const CC_Mqtt311PublishConfig& config);
     CC_Mqtt311ErrorCode setResendAttempts(unsigned attempts);
     unsigned getResendAttempts() const;
     CC_Mqtt311ErrorCode send(CC_Mqtt311PublishCompleteCb cb, void* cbData);
     CC_Mqtt311ErrorCode cancel();
     void postReconnectionResend();
+    void forceDupResend();
+    bool resume();
+    bool isPaused() const
+    {
+        return m_paused;
+    }
+
+    bool isPublished() const
+    {
+        return m_published;
+    }
+
+    bool isAcked() const
+    {
+        return m_acked;
+    }
 
 protected:
     virtual Type typeImpl() const override;    
@@ -74,7 +95,9 @@ private:
     void responseTimeoutInternal();
     void resendDupMsg();
     void completeWithCb(CC_Mqtt311AsyncOpStatus status);
+    void confirmRegisteredAlias();
     CC_Mqtt311ErrorCode doSendInternal();
+    bool canSend() const;
     void opCompleteInternal();
 
     static void recvTimeoutCb(void* data);
@@ -85,7 +108,9 @@ private:
     void* m_cbData = nullptr;    
     unsigned m_totalSendAttempts = DefaultSendAttempts;
     unsigned m_sendAttempts = 0U;
+    bool m_published = false;
     bool m_acked = false;
+    bool m_paused = false;
 
     static constexpr unsigned DefaultSendAttempts = 2U;
     static_assert(ExtConfig::SendOpTimers == 1U);

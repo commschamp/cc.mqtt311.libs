@@ -38,6 +38,8 @@ public:
         Type_NumOfValues // Must be last
     };
 
+    using Qos = PublishMsg::TransportField_flags::Field_qos::ValueType;
+
     virtual ~Op() noexcept = default;
 
     Type type() const
@@ -66,7 +68,7 @@ public:
     }
 
     inline 
-    static bool verifyQosValid(PublishMsg::TransportField_flags::Field_qos::ValueType qos)
+    static bool verifyQosValid(Qos qos)
     {
         return (qos <= static_cast<decltype(qos)>(Config::MaxQos));
     }    

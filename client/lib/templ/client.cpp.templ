@@ -699,6 +699,24 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
     return cc_mqtt311_##NAME##client_publish_send(publish, cb, cbData);    
 }
 
+CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_ordering(CC_Mqtt311ClientHandle handle, CC_Mqtt311PublishOrdering ordering)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    return clientFromHandle(handle)->setPublishOrdering(ordering);
+}
+
+CC_Mqtt311PublishOrdering cc_mqtt311_##NAME##client_publish_get_ordering(CC_Mqtt311ClientHandle handle)
+{
+    if (handle == nullptr) {
+        return CC_Mqtt311PublishOrdering_ValuesLimit;
+    }   
+
+     return clientFromHandle(handle)->getPublishOrdering();
+}
+
 // --------------------- Callbacks ---------------------
 
 void cc_mqtt311_##NAME##client_set_next_tick_program_callback(

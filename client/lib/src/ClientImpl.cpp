@@ -425,6 +425,17 @@ op::SendOp* ClientImpl::publishPrepare(CC_Mqtt311ErrorCode* ec)
     return sendOp;
 }
 
+CC_Mqtt311ErrorCode ClientImpl::setPublishOrdering(CC_Mqtt311PublishOrdering ordering)
+{
+    if (CC_Mqtt311PublishOrdering_ValuesLimit <= ordering) {
+        errorLog("Bad publish ordering value");
+        return CC_Mqtt311ErrorCode_BadParam;
+    }
+
+    m_configState.m_publishOrdering = ordering;
+    return CC_Mqtt311ErrorCode_Success;
+}
+
 void ClientImpl::handle(PublishMsg& msg)
 {
     if (m_sessionState.m_disconnecting) {
@@ -450,7 +461,7 @@ void ClientImpl::handle(PublishMsg& msg)
                 msg.dispatch(*m_recvOps.back());
             };
 
-        using Qos = PublishMsg::TransportField_flags::Field_qos::ValueType;
+        using Qos = op::Op::Qos;
         auto qos = msg.transportField_flags().field_qos().value();
         if ((qos == Qos::AtMostOnceDelivery) || 
             (qos == Qos::AtLeastOnceDelivery)) {
@@ -499,7 +510,7 @@ void ClientImpl::handle(PublishMsg& msg)
 void ClientImpl::handle(PubackMsg& msg)
 {
     static_assert(Config::MaxQos >= 1);
-    if (!handlePublishRelatedMessage(msg, msg.field_packetId().value())) {
+    if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
         errorLog("PUBACK with unknown packet id");
     }    
 }
@@ -509,9 +520,9 @@ void ClientImpl::handle(PubackMsg& msg)
 void ClientImpl::handle(PubrecMsg& msg)
 {
     static_assert(Config::MaxQos >= 2);
-    if (!handlePublishRelatedMessage(msg, msg.field_packetId().value())) {
+    if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
         errorLog("PUBREC with unknown packet id");
-    }
+    }       
 }
 
 void ClientImpl::handle(PubrelMsg& msg)
@@ -541,9 +552,9 @@ void ClientImpl::handle(PubrelMsg& msg)
 void ClientImpl::handle(PubcompMsg& msg)
 {
     static_assert(Config::MaxQos >= 2);
-    if (!handlePublishRelatedMessage(msg, msg.field_packetId().value())) {
+    if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
         errorLog("PUBCOMP with unknown packet id");
-    }
+    }    
 }
 
 #endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 2
@@ -705,6 +716,48 @@ void ClientImpl::reportMsgInfo(const CC_Mqtt311MessageInfo& info)
     m_messageReceivedReportCb(m_messageReceivedReportData, &info);
 }
 
+bool ClientImpl::hasPausedSendsBefore(const op::SendOp* sendOp) const
+{
+    auto riter = 
+        std::find_if(
+            m_sendOps.rbegin(), m_sendOps.rend(),
+            [sendOp](auto& opPtr)
+            {
+                return opPtr.get() == sendOp;
+            });
+
+    COMMS_ASSERT(riter != m_sendOps.rend());
+    if (riter == m_sendOps.rend()) {
+        return false;
+    }
+
+    auto iter = riter.base() - 1;
+    auto idx = static_cast<unsigned>(std::distance(m_sendOps.begin(), iter));
+    COMMS_ASSERT(idx < m_sendOps.size());
+    if (idx == 0U) {
+        return false;
+    }
+
+    auto& prevSendOpPtr = m_sendOps[idx - 1U];
+    return prevSendOpPtr->isPaused();
+}
+
+bool ClientImpl::hasHigherQosSendsBefore(const op::SendOp* sendOp, op::Op::Qos qos) const
+{
+    for (auto& sendOpPtr : m_sendOps) {
+        if (sendOpPtr.get() == sendOp) {
+            return false;
+        }
+
+        if (sendOpPtr->qos() > qos) {
+            return true;
+        }
+    }
+
+    COMMS_ASSERT(false); // Mustn't reach here
+    return false;
+}
+
 void ClientImpl::allowNextPrepare()
 {
     COMMS_ASSERT(m_preparationLocked);
@@ -844,12 +897,8 @@ CC_Mqtt311ErrorCode ClientImpl::initInternal()
     return CC_Mqtt311ErrorCode_Success;
 }
 
-bool ClientImpl::handlePublishRelatedMessage(ProtMessage& msg, unsigned packetId)
+op::SendOp* ClientImpl::findSendOp(std::uint16_t packetId)
 {
-    for (auto& opPtr : m_keepAliveOps) {
-        msg.dispatch(*opPtr);
-    }
-
     auto iter = 
         std::find_if(
             m_sendOps.begin(), m_sendOps.end(),
@@ -858,11 +907,64 @@ bool ClientImpl::handlePublishRelatedMessage(ProtMessage& msg, unsigned packetId
                 return opPtr->packetId() == packetId;
             });
 
-    if (iter != m_sendOps.end()) {
+    if (iter == m_sendOps.end()) {
+        return nullptr;
+    }
+
+    return iter->get();
+}
+
+bool ClientImpl::isLegitSendAck(const op::SendOp* sendOp, bool pubcompAck) const
+{
+    if (!sendOp->isPublished()) {
         return false;
     }
 
-    msg.dispatch(**iter);
+    for (auto& sendOpPtr : m_sendOps) {
+        if (sendOpPtr.get() == sendOp) {
+            return true;
+        }
+
+        if (!sendOpPtr->isAcked()) {
+            return false;
+        }
+
+        if (pubcompAck && (sendOp != m_sendOps.front().get())) {
+            return false;
+        }
+    }
+
+    COMMS_ASSERT(false); // Should not be reached;
+    return false;
+}
+
+void ClientImpl::resendAllUntil(op::SendOp* sendOp)
+{
+    for (auto& sendOpPtr : m_sendOps) {
+        sendOpPtr->forceDupResend();
+        if (sendOpPtr.get() == sendOp) {
+            break;
+        }
+    }
+}
+
+bool ClientImpl::processPublishAckMsg(ProtMessage& msg, std::uint16_t packetId, bool pubcompAck)
+{
+    for (auto& opPtr : m_keepAliveOps) {
+        msg.dispatch(*opPtr);
+    }     
+
+    auto* sendOp = findSendOp(packetId);
+    if (sendOp == nullptr) {
+        return false;
+    }
+
+    if (isLegitSendAck(sendOp, pubcompAck)) {
+        msg.dispatch(*sendOp);
+        return true;        
+    }
+
+    resendAllUntil(sendOp);
     return true;
 }
 

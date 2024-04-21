@@ -72,6 +72,12 @@ public:
     op::SubscribeOp* subscribePrepare(CC_Mqtt311ErrorCode* ec);
     op::UnsubscribeOp* unsubscribePrepare(CC_Mqtt311ErrorCode* ec);
     op::SendOp* publishPrepare(CC_Mqtt311ErrorCode* ec);
+
+    CC_Mqtt311ErrorCode setPublishOrdering(CC_Mqtt311PublishOrdering ordering);
+    CC_Mqtt311PublishOrdering getPublishOrdering() const
+    {
+        return m_configState.m_publishOrdering;
+    }    
     
     std::size_t sendsCount() const
     {
@@ -150,7 +156,8 @@ public:
         bool reportDisconnection, 
         CC_Mqtt311AsyncOpStatus status = CC_Mqtt311AsyncOpStatus_BrokerDisconnected);
     void reportMsgInfo(const CC_Mqtt311MessageInfo& info);
-    // bool hasPausedSendsBefore(const op::SendOp* sendOp) const;
+    bool hasPausedSendsBefore(const op::SendOp* sendOp) const;
+    bool hasHigherQosSendsBefore(const op::SendOp* sendOp, op::Op::Qos qos) const;
     void allowNextPrepare();
 
     TimerMgr& timerMgr()
@@ -159,6 +166,11 @@ public:
     }
 
     ConfigState& configState()
+    {
+        return m_configState;
+    }
+
+    const ConfigState& configState() const
     {
         return m_configState;
     }
@@ -240,7 +252,10 @@ private:
     void cleanOps();
     void errorLogInternal(const char* msg);
     CC_Mqtt311ErrorCode initInternal();
-    bool handlePublishRelatedMessage(ProtMessage& msg, unsigned packetId);
+    op::SendOp* findSendOp(std::uint16_t packetId);
+    bool isLegitSendAck(const op::SendOp* sendOp, bool pubcompAck = false) const;
+    void resendAllUntil(op::SendOp* sendOp);
+    bool processPublishAckMsg(ProtMessage& msg, std::uint16_t packetId, bool pubcompAck = false);
 
     void opComplete_Connect(const op::Op* op);
     void opComplete_KeepAlive(const op::Op* op);
