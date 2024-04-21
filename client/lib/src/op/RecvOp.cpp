@@ -99,14 +99,14 @@ void RecvOp::handle(PublishMsg& msg)
 
     if (qos > Qos::ExactlyOnceDelivery) {
         errorLog("Received PUBLISH with unknown Qos value.");
-        client().brokerDisconnected(true);
+        client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;         
     }
 
 
     if (!verifyQosValid(qos)) {
         errorLog("Invalid QoS in PUBLISH from broker");
-        client().brokerDisconnected(true);
+        client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;
     }    
 
@@ -134,14 +134,14 @@ void RecvOp::handle(PublishMsg& msg)
 
     if (!sessionState.m_connected) {
         errorLog("Received PUBLISH when not CONNECTED");
-        client().brokerDisconnected(true);
+        client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;
     }
 
     auto& topic = msg.field_topic().value();
     if ((topic.empty()) || (!verifyPubTopic(topic.c_str(), false))) {
         errorLog("Received PUBLISH with invalid topic format.");
-        client().brokerDisconnected(true);
+        client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;
     }
 
@@ -158,7 +158,7 @@ void RecvOp::handle(PublishMsg& msg)
 
             if (iter == subFilters.end()) {
                 errorLog("Received PUBLISH on non-subscribed topic");
-                client().brokerDisconnected(true);
+                client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
                 return;                
             }
         }
@@ -185,7 +185,7 @@ void RecvOp::handle(PublishMsg& msg)
         if (!msg.field_packetId().doesExist()) {
             [[maybe_unused]] static constexpr bool ProtocolDecodingError = false;
             COMMS_ASSERT(ProtocolDecodingError);
-            client().brokerDisconnected(true);
+            client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             return;
         }    
 
@@ -222,7 +222,7 @@ void RecvOp::handle(PubrelMsg& msg)
 
     if (!msg.doValid()) {
         errorLog("Received invalid flags in PUBREL message");
-        client().brokerDisconnected(true);
+        client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;
     }
 

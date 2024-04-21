@@ -153,7 +153,7 @@ public:
     void opComplete(const op::Op* op);
     void brokerConnected(bool sessionPresent);
     void brokerDisconnected(
-        bool reportDisconnection, 
+        CC_Mqtt311BrokerDisconnectReason reason = CC_Mqtt311BrokerDisconnectReason_ValuesLimit,  
         CC_Mqtt311AsyncOpStatus status = CC_Mqtt311AsyncOpStatus_BrokerDisconnected);
     void reportMsgInfo(const CC_Mqtt311MessageInfo& info);
     bool hasPausedSendsBefore(const op::SendOp* sendOp) const;

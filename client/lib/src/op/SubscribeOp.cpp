@@ -160,9 +160,13 @@ void SubscribeOp::handle(SubackMsg& msg)
 
     auto terminateOnExit = 
         comms::util::makeScopeGuard(
-            [&cl = client()]()
+            [&cl = client(), &status]()
             {
-                cl.brokerDisconnected(true);
+                auto reason = CC_Mqtt311BrokerDisconnectReason_ProtocolError;
+                if (status == CC_Mqtt311AsyncOpStatus_InternalError) {
+                    reason = CC_Mqtt311BrokerDisconnectReason_InternalError;
+                }
+                cl.brokerDisconnected(reason);
             }
         );    
 

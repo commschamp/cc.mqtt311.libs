@@ -80,7 +80,7 @@ unsigned ClientImpl::processData(const std::uint8_t* iter, unsigned len)
         comms::util::makeScopeGuard(
             [this]()
             {
-                brokerDisconnected(true, CC_Mqtt311AsyncOpStatus_ProtocolError);
+                brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError, CC_Mqtt311AsyncOpStatus_ProtocolError);
             });
 
     unsigned consumed = 0;
@@ -138,7 +138,7 @@ void ClientImpl::notifyNetworkDisconnected()
         return; // No need to go through broker disconnection
     }
     
-    brokerDisconnected(false);
+    brokerDisconnected();
 }
 
 bool ClientImpl::isNetworkDisconnected() const
@@ -488,7 +488,7 @@ void ClientImpl::handle(PublishMsg& msg)
 
             if (!msg.transportField_flags().field_dup().getBitValue_bit()) {
                 errorLog("Non duplicate PUBLISH with packet ID in use");
-                brokerDisconnected(true);
+                brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
                 return;
             }
             else {
@@ -687,11 +687,9 @@ void ClientImpl::brokerConnected(bool sessionPresent)
 }
 
 void ClientImpl::brokerDisconnected(
-    bool reportDisconnection, 
+    CC_Mqtt311BrokerDisconnectReason reason, 
     CC_Mqtt311AsyncOpStatus status)
 {
-    static_cast<void>(reportDisconnection);
-    static_cast<void>(status);
     m_clientState.m_initialized = false; // Require re-initialization
     m_sessionState.m_connected = false;
 
@@ -704,9 +702,9 @@ void ClientImpl::brokerDisconnected(
         }
     } 
 
-    if (reportDisconnection) {
+    if (reason < CC_Mqtt311BrokerDisconnectReason_ValuesLimit) {
         COMMS_ASSERT(m_brokerDisconnectReportCb != nullptr);
-        m_brokerDisconnectReportCb(m_brokerDisconnectReportData);
+        m_brokerDisconnectReportCb(m_brokerDisconnectReportData, reason);
     }
 }
 

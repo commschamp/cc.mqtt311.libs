@@ -29,7 +29,7 @@ CC_Mqtt311ErrorCode DisconnectOp::send()
     auto& clientObj = client();
     clientObj.sendMessage(m_disconnectMsg);
     opComplete(); // No members access after this point, the op will be deleted
-    clientObj.brokerDisconnected(false);
+    clientObj.brokerDisconnected();
     return CC_Mqtt311ErrorCode_Success;
 }
 

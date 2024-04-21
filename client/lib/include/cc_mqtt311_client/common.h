@@ -370,7 +370,7 @@ typedef void (*CC_Mqtt311SendOutputDataCb)(void* data, const unsigned char* buf,
 /// @param[in] data Pointer to user data object, passed as the last parameter to
 ///     the request call.
 /// @ingroup client
-typedef void (*CC_Mqtt311BrokerDisconnectReportCb)(void* data);
+typedef void (*CC_Mqtt311BrokerDisconnectReportCb)(void* data, CC_Mqtt311BrokerDisconnectReason reason);
 
 /// @brief Callback used to report new message received of the broker.
 /// @param[in] data Pointer to user data object, passed as the last parameter to

@@ -51,7 +51,7 @@ void SendOp::handle(PubackMsg& msg)
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
-                cl.brokerDisconnected(true);
+                cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
         );      
 
@@ -90,7 +90,7 @@ void SendOp::handle(PubrecMsg& msg)
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
-                cl.brokerDisconnected(true);
+                cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
         );      
 
@@ -145,7 +145,7 @@ void SendOp::handle(PubcompMsg& msg)
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
-                cl.brokerDisconnected(true);
+                cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
         );      
 

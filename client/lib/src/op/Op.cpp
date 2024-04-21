@@ -112,41 +112,6 @@ void Op::releasePacketId(std::uint16_t id)
     allocatedPacketIds.erase(iter);
 }
 
-// void Op::sendDisconnectWithReason(ClientImpl& client, DisconnectReason reason)
-// {
-//     DisconnectMsg disconnectMsg;
-//     disconnectMsg.field_reasonCode().setExists();
-//     disconnectMsg.field_properties().setExists();
-//     disconnectMsg.field_reasonCode().field().setValue(reason);    
-//     client.sendMessage(disconnectMsg);
-// }
-
-// void Op::sendDisconnectWithReason(DisconnectReason reason)
-// {
-//     sendDisconnectWithReason(m_client, reason);
-// }
-
-// void Op::terminationWithReasonStatic(ClientImpl& client, DisconnectReason reason)
-// {
-//     sendDisconnectWithReason(client, reason);
-//     client.brokerDisconnected(true);
-// }
-
-// void Op::terminationWithReason(DisconnectReason reason)
-// {
-//     terminationWithReasonStatic(m_client, reason);
-// }
-
-// void Op::protocolErrorTermination(ClientImpl& client)
-// {
-//     terminationWithReasonStatic(client, DisconnectReason::ProtocolError);
-// }
-
-// void Op::protocolErrorTermination()
-// {
-//     protocolErrorTermination(m_client);
-// }
-
 void Op::errorLogInternal(const char* msg)
 {
     if constexpr (Config::HasErrorLog) {

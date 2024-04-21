@@ -95,7 +95,7 @@ void KeepAliveOp::pingTimeoutInternal()
 {
     errorLog("The broker did not respond to PING");
     COMMS_ASSERT(!m_respTimer.isActive());
-    client().brokerDisconnected(true);
+    client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_NoBrokerResponse);
 }
 
 void KeepAliveOp::sendPingCb(void* data)
