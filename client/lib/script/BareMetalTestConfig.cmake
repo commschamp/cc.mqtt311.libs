@@ -37,18 +37,6 @@ set (CC_MQTT311_CLIENT_RECEIVE_MAX_LIMIT 4)
 # Limit the amount of unacknowledged QoS1 and QoS2 messages being sent in parallel
 set (CC_MQTT311_CLIENT_SEND_MAX_LIMIT 6)
 
-# Disable usage of topic aliases
-set (CC_MQTT311_CLIENT_HAS_TOPIC_ALIASES FALSE)
-
-# Limit the amount topic aliases the client is allowed to record when topic aliases are enabled
-#set (CC_MQTT311_CLIENT_TOPIC_ALIASES_LIMIT 10)
-
-# Disable usage of the "Subscription IDs"
-set (CC_MQTT311_CLIENT_HAS_SUB_IDS FALSE)
-
-# Limit the amount of allowed subcription IDs reported for a received message
-#set (CC_MQTT311_CLIENT_SUB_IDS_LIMIT 3)
-
 # Limit the amount of ongoing (unacknowledged) subscribe operations
 set (CC_MQTT311_CLIENT_ASYNC_SUBS_LIMIT 3)
 
