@@ -271,4 +271,4 @@ if (NOT "${CC_MQTT311_CUSTOM_CLIENT_CONFIG_FILES}" STREQUAL "")
     endforeach ()
 endif ()
 
-#add_subdirectory(test)
+add_subdirectory(test)
