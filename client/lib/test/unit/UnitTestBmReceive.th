@@ -1,0 +1,111 @@
+#include "UnitTestBmBase.h"
+#include "UnitTestProtocolDefs.h"
+
+#include <cxxtest/TestSuite.h>
+
+class UnitTestBmReceive : public CxxTest::TestSuite, public UnitTestBmBase
+{
+public:
+    void test1();
+    void test2();
+    void test3();
+
+private:
+    virtual void setUp() override
+    {
+        unitTestSetUp();
+    }
+
+    virtual void tearDown() override
+    {
+        unitTestTearDown();
+    }
+};
+
+void UnitTestBmReceive::test1()
+{
+    // Simple receive of Qos0
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    unitTestPerformBasicSubscribe(client, "#");
+    unitTestTick(client, 1000);
+
+    const std::string Topic = "some/topic";
+    const UnitTestData Data = {'h', 'e', 'l', 'l', 'o'};
+
+    UnitTestPublishMsg publishMsg;
+    publishMsg.field_topic().value() = Topic;
+    publishMsg.field_payload().value() = Data;
+    publishMsg.doRefresh();
+    unitTestReceiveMessage(client, publishMsg);
+
+    TS_ASSERT(unitTestHasMessageRecieved());
+    auto& msgInfo = unitTestReceivedMessageInfo();
+    TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
+    TS_ASSERT_EQUALS(msgInfo.m_data, Data);
+    TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_AtMostOnceDelivery);
+    unitTestPopReceivedMessageInfo();
+}
+
+void UnitTestBmReceive::test2()
+{
+    // Testing ignore of the user properties
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    unitTestPerformBasicSubscribe(client, "#");
+    unitTestTick(client, 1000);
+
+    const std::string Topic = "some/topic";
+    const UnitTestData Data = {'h', 'e', 'l', 'l', 'o'};
+
+    UnitTestPublishMsg publishMsg;
+    publishMsg.field_topic().value() = Topic;
+    publishMsg.field_payload().value() = Data;
+    publishMsg.doRefresh();
+    unitTestReceiveMessage(client, publishMsg);
+
+    TS_ASSERT(unitTestHasMessageRecieved());
+    auto& msgInfo = unitTestReceivedMessageInfo();
+    TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
+    TS_ASSERT_EQUALS(msgInfo.m_data, Data);
+    TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_AtMostOnceDelivery);
+    unitTestPopReceivedMessageInfo();
+}
+
+void UnitTestBmReceive::test3()
+{
+    // Testing ignore of the too many properties
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    unitTestPerformBasicSubscribe(client, "#");
+    unitTestTick(client, 1000);
+
+    const std::string Topic = "some/topic";
+    const UnitTestData Data = {'h', 'e', 'l', 'l', 'o'};
+    const bool Retain = true;
+
+    UnitTestPublishMsg publishMsg;
+    publishMsg.transportField_flags().field_retain().setBitValue_bit(Retain);
+    publishMsg.field_topic().value() = Topic;
+    publishMsg.field_payload().value() = Data;
+    publishMsg.doRefresh();
+    unitTestReceiveMessage(client, publishMsg);
+
+    TS_ASSERT(unitTestHasMessageRecieved());
+    auto& msgInfo = unitTestReceivedMessageInfo();
+    TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
+    TS_ASSERT_EQUALS(msgInfo.m_data, Data);
+    TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_AtMostOnceDelivery);
+    TS_ASSERT_EQUALS(msgInfo.m_retained, Retain);
+    unitTestPopReceivedMessageInfo();
+}

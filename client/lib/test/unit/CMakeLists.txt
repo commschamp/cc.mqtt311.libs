@@ -59,10 +59,10 @@ if (TARGET cc::cc_mqtt311_bm_client)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 
-#    cc_mqtt311_client_add_unit_test(UnitTestBmClient ${BM_BASE_LIB_NAME})
-#    cc_mqtt311_client_add_unit_test(UnitTestBmConnect ${BM_BASE_LIB_NAME})
-#    cc_mqtt311_client_add_unit_test(UnitTestBmPublish ${BM_BASE_LIB_NAME})
-#    cc_mqtt311_client_add_unit_test(UnitTestBmReceive ${BM_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestBmClient ${BM_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestBmConnect ${BM_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestBmPublish ${BM_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestBmReceive ${BM_BASE_LIB_NAME})
 endif ()  
 
 if (TARGET cc::cc_mqtt311_qos1_client)
