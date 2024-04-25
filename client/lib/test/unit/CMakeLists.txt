@@ -94,7 +94,7 @@ if (TARGET cc::cc_mqtt311_qos0_client)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 
-#    cc_mqtt311_client_add_unit_test(UnitTestQos0Publish ${QOS0_BASE_LIB_NAME})
-#    cc_mqtt311_client_add_unit_test(UnitTestQos0Receive ${QOS0_BASE_LIB_NAME})
-#    cc_mqtt311_client_add_unit_test(UnitTestQos0Subscribe ${QOS0_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestQos0Publish ${QOS0_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestQos0Receive ${QOS0_BASE_LIB_NAME})
+    cc_mqtt311_client_add_unit_test(UnitTestQos0Subscribe ${QOS0_BASE_LIB_NAME})
 endif ()  
