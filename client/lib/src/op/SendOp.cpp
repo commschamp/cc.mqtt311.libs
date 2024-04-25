@@ -39,7 +39,7 @@ SendOp::~SendOp()
 }
 
 #if CC_MQTT311_CLIENT_MAX_QOS >= 1 
-void SendOp::handle(PubackMsg& msg)
+void SendOp::handle([[maybe_unused]] PubackMsg& msg)
 {
     static_assert(Config::MaxQos >= 1);
     COMMS_ASSERT(m_pubMsg.field_packetId().field().value() == msg.field_packetId().value());
