@@ -22,7 +22,7 @@ namespace
 {
 
 template <typename TList>
-void eraseFromList(const op::Op* op, TList& list)
+unsigned eraseFromList(const op::Op* op, TList& list)
 {
     auto iter = 
         std::find_if(
@@ -32,12 +32,14 @@ void eraseFromList(const op::Op* op, TList& list)
                 return op == opPtr.get();
             });
 
+    auto result = static_cast<unsigned>(std::distance(list.begin(), iter));
+
     COMMS_ASSERT(iter != list.end());
-    if (iter == list.end()) {
-        return;
+    if (iter != list.end()) {
+        list.erase(iter);
     }
 
-    list.erase(iter);
+    return result;
 }
 
 void updateEc(CC_Mqtt311ErrorCode* ec, CC_Mqtt311ErrorCode val)
@@ -552,7 +554,7 @@ void ClientImpl::handle(PubrelMsg& msg)
 void ClientImpl::handle(PubcompMsg& msg)
 {
     static_assert(Config::MaxQos >= 2);
-    if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
+    if (!processPublishAckMsg(msg, msg.field_packetId().value(), true)) {
         errorLog("PUBCOMP with unknown packet id");
     }    
 }
@@ -667,6 +669,22 @@ void ClientImpl::brokerConnected(bool sessionPresent)
             for (auto& recvOpPtr : m_recvOps) {
                 recvOpPtr->postReconnectionResume();
             }    
+
+            auto resumeUntilIdx = m_sendOps.size(); 
+            auto resumeFromIdx = resumeUntilIdx; 
+            for (auto count = resumeUntilIdx; count > 0U; --count) {
+                auto idx = count - 1U;
+                auto& sendOpPtr = m_sendOps[idx];
+                if (!sendOpPtr->isPaused()) {
+                    break;
+                }
+
+                resumeFromIdx = idx;
+            }
+
+            if (resumeFromIdx < resumeUntilIdx) {
+                resumeSendOpsSince(static_cast<unsigned>(resumeFromIdx));
+            }            
 
             break;
         }
@@ -895,6 +913,23 @@ CC_Mqtt311ErrorCode ClientImpl::initInternal()
     return CC_Mqtt311ErrorCode_Success;
 }
 
+void ClientImpl::resumeSendOpsSince(unsigned idx)
+{
+    while (idx < m_sendOps.size()) {
+        auto& opToResumePtr = m_sendOps[idx];
+        if (!opToResumePtr->isPaused()) {
+            ++idx;
+            continue;
+        }         
+        
+        if (!opToResumePtr->resume()) {
+            break;
+        }
+
+        // After resuming some (QoS0) ops can complete right away, increment idx next iteration
+    }
+}
+
 op::SendOp* ClientImpl::findSendOp(std::uint16_t packetId)
 {
     auto iter = 
@@ -998,7 +1033,12 @@ void ClientImpl::opComplete_Recv(const op::Op* op)
 
 void ClientImpl::opComplete_Send(const op::Op* op)
 {
-    eraseFromList(op, m_sendOps);
+    auto idx = eraseFromList(op, m_sendOps);
+    if (m_sessionState.m_disconnecting) {
+        return;
+    }
+
+    resumeSendOpsSince(idx);
 }
 
 } // namespace cc_mqtt311_client

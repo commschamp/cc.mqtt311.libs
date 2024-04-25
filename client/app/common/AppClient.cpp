@@ -89,24 +89,6 @@ void printSubscribeReturnCode(CC_Mqtt311SubscribeReturnCode val)
     std::cout << "\tReturn Code: " << AppClient::toString(val) << '\n';
 }
 
-void printReasonString(const char* val)
-{
-    printString("Reason String", val);
-}
-
-void printResponseInfo(const char* val)
-{
-    printString("Response Information", val);
-}
-
-void printUserProperties(const CC_Mqtt311UserProp* props, unsigned propsCount)
-{
-    for (auto idx = 0U; idx < propsCount; ++idx) {
-        auto& p = props[idx];
-        std::cout << "\tUser Property: " << p.m_key << "=" << p.m_value << '\n';
-    }    
-}
-
 } // namespace 
     
 bool AppClient::start(int argc, const char* argv[])

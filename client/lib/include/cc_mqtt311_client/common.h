@@ -181,15 +181,6 @@ struct CC_Mqtt311Publish;
 /// @ingroup publish
 typedef CC_Mqtt311Publish* CC_Mqtt311PublishHandle;
 
-/// @brief Wraping structre of the single "User Property".
-/// @see @b cc_mqtt311_client_init_user_prop()
-/// @ingroup global
-typedef struct
-{
-    const char* m_key; ///< Key string, mustn't be NULL
-    const char* m_value; ///< Value string, can be NULL
-} CC_Mqtt311UserProp;
-
 /// @brief Configuration structure to be passed to the @b cc_mqtt311_client_connect_config().
 /// @see @b cc_mqtt311_client_connect_init_config()
 /// @ingroup connect

@@ -252,6 +252,7 @@ private:
     void cleanOps();
     void errorLogInternal(const char* msg);
     CC_Mqtt311ErrorCode initInternal();
+    void resumeSendOpsSince(unsigned idx);
     op::SendOp* findSendOp(std::uint16_t packetId);
     bool isLegitSendAck(const op::SendOp* sendOp, bool pubcompAck = false) const;
     void resendAllUntil(op::SendOp* sendOp);
