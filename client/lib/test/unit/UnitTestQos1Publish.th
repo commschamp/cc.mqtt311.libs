@@ -1,0 +1,77 @@
+#include "UnitTestQos1Base.h"
+#include "UnitTestProtocolDefs.h"
+
+#include <cxxtest/TestSuite.h>
+
+class UnitTestQos1Publish : public CxxTest::TestSuite, public UnitTestQos1Base
+{
+public:
+    void test1();
+
+private:
+    virtual void setUp() override
+    {
+        unitTestSetUp();
+    }
+
+    virtual void tearDown() override
+    {
+        unitTestTearDown();
+    }
+};
+
+void UnitTestQos1Publish::test1()
+{
+    // Rejecting Qos2 configuration
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto* publish = apiPublishPrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(publish, nullptr);
+    TS_ASSERT_EQUALS(apiPublishCount(client), 1U);
+
+    const std::string Topic("some/topic");
+    const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
+
+    auto config = CC_Mqtt311PublishConfig();
+    apiPublishInitConfig(&config);
+
+    config.m_topic = Topic.c_str();
+    config.m_data = &Data[0];
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
+    config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
+
+    auto ec = apiPublishConfig(publish, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
+
+    config.m_qos = CC_Mqtt311QoS_AtLeastOnceDelivery;
+    ec = apiPublishConfig(publish, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendPublish(publish);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsPublishComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
+
+    TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(publishMsg->transportField_flags().field_qos().value()), CC_Mqtt311QoS_AtLeastOnceDelivery);
+    TS_ASSERT_EQUALS(publishMsg->field_topic().value(), Topic);
+    TS_ASSERT(publishMsg->field_packetId().doesExist());
+    TS_ASSERT_EQUALS(publishMsg->field_payload().value(), Data);
+
+    unitTestTick(client, 1000);
+    UnitTestPubackMsg pubackMsg;
+    pubackMsg.field_packetId().value() = publishMsg->field_packetId().field().value();
+    unitTestReceiveMessage(client, pubackMsg); 
+
+    TS_ASSERT(unitTestIsPublishComplete());
+    auto& pubackInfo = unitTestPublishResponseInfo();
+    TS_ASSERT_EQUALS(pubackInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
+    unitTestPopPublishResponseInfo();       
+}

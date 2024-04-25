@@ -1,0 +1,71 @@
+#include "UnitTestQos1Base.h"
+#include "UnitTestProtocolDefs.h"
+
+#include <cxxtest/TestSuite.h>
+
+class UnitTestQos1Subscribe : public CxxTest::TestSuite, public UnitTestQos1Base
+{
+public:
+    void test1();
+
+private:
+    virtual void setUp() override
+    {
+        unitTestSetUp();
+    }
+
+    virtual void tearDown() override
+    {
+        unitTestTearDown();
+    }
+};
+
+void UnitTestQos1Subscribe::test1()
+{
+    // Rejection QoS2 subscription attempt
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));    
+
+    auto subscribeConfig = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig);
+    subscribeConfig.m_topic = "#";
+    subscribeConfig.m_maxQos = CC_Mqtt311QoS_ExactlyOnceDelivery;
+
+    auto* subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    auto ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
+
+    subscribeConfig.m_maxQos = CC_Mqtt311QoS_AtLeastOnceDelivery;
+    ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
+    TS_ASSERT_DIFFERS(subscribeMsg, nullptr);
+
+    UnitTestSubackMsg subackMsg;
+    subackMsg.field_packetId().value() = subscribeMsg->field_packetId().value();
+    subackMsg.field_list().value().resize(1);
+    subackMsg.field_list().value()[0].setValue(CC_Mqtt311SubscribeReturnCode_SuccessQos2);
+    
+    unitTestReceiveMessage(client, subackMsg);
+    TS_ASSERT(unitTestIsSubscribeComplete());
+
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_ProtocolError);
+    unitTestPopSubscribeResponseInfo();     
+
+    TS_ASSERT(unitTestHasDisconnectInfo());      
+    auto& disconnectInfo = unitTestDisconnectInfo();
+    TS_ASSERT_EQUALS(disconnectInfo.m_reason, CC_Mqtt311BrokerDisconnectReason_ProtocolError);
+    unitTestPopDisconnectInfo();  
+}
