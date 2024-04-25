@@ -1023,6 +1023,10 @@
 /// @li @b Message13 - QoS0
 /// @li @b Message14 - QoS2
 ///
+/// To inquire whether the @b PUBLISH message was actually sent, the @b cc_mqtt311_client_publish_was_initiated()
+/// function can be used. If the function returns false, the "publish" operation can be
+/// safely @ref doc_cc_mqtt311_client_publish_cancel "cancelled" without any possible side effects.
+///
 /// @subsection doc_cc_mqtt311_client_publish_simplify Simplifying the "Publish" Operation Preparation.
 /// In many use cases the "publish" operation can be quite simple with a lot of defaults.
 /// To simplify the sequence of the operation preparation and handling of errors,

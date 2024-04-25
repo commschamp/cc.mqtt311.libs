@@ -60,6 +60,7 @@ const UnitTestBmBase::LibFuncs& UnitTestBmBase::getFuncs()
     funcs.m_publish_config = &cc_mqtt311_bm_client_publish_config;
     funcs.m_publish_send = &cc_mqtt311_bm_client_publish_send;
     funcs.m_publish_cancel = &cc_mqtt311_bm_client_publish_cancel;    
+    funcs.m_publish_was_initiated = &cc_mqtt311_bm_client_publish_was_initiated;    
     funcs.m_publish = &cc_mqtt311_bm_client_publish;    
     funcs.m_publish_set_ordering = &cc_mqtt311_bm_client_publish_set_ordering;
     funcs.m_publish_get_ordering = &cc_mqtt311_bm_client_publish_get_ordering;

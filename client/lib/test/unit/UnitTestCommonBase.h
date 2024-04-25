@@ -79,6 +79,7 @@ public:
         CC_Mqtt311ErrorCode (*m_publish_config)(CC_Mqtt311PublishHandle, const CC_Mqtt311PublishConfig*) = nullptr;
         CC_Mqtt311ErrorCode (*m_publish_send)(CC_Mqtt311PublishHandle, CC_Mqtt311PublishCompleteCb, void*) = nullptr;
         CC_Mqtt311ErrorCode (*m_publish_cancel)(CC_Mqtt311PublishHandle) = nullptr;
+        bool (*m_publish_was_initiated)(CC_Mqtt311PublishHandle) = nullptr;
         CC_Mqtt311ErrorCode (*m_publish)(CC_Mqtt311ClientHandle, const CC_Mqtt311PublishConfig*, CC_Mqtt311PublishCompleteCb, void*) = nullptr;
         CC_Mqtt311ErrorCode (*m_publish_set_ordering)(CC_Mqtt311ClientHandle, CC_Mqtt311PublishOrdering) = nullptr;
         CC_Mqtt311PublishOrdering (*m_publish_get_ordering)(CC_Mqtt311ClientHandle) = nullptr;
@@ -287,6 +288,7 @@ protected:
     CC_Mqtt311ErrorCode apiPublishSetResponseTimeout(CC_Mqtt311PublishHandle handle, unsigned ms);
     CC_Mqtt311ErrorCode apiPublishConfig(CC_Mqtt311PublishHandle handle, const CC_Mqtt311PublishConfig* config);
     CC_Mqtt311ErrorCode apiPublishCancel(CC_Mqtt311PublishHandle handle);
+    bool apiPublishWasInitiated(CC_Mqtt311PublishHandle handle);
     CC_Mqtt311ErrorCode apiPublishSetOrdering(CC_Mqtt311ClientHandle handle, CC_Mqtt311PublishOrdering ordering);
     CC_Mqtt311PublishOrdering apiPublishGetOrdering(CC_Mqtt311ClientHandle handle);
     void apiSetNextTickProgramCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311NextTickProgramCb cb, void* data);    

@@ -505,6 +505,15 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_send(CC_Mqtt311PublishHand
 /// @ingroup publish
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_cancel(CC_Mqtt311PublishHandle handle);
 
+/// @brief Check whether the "publish" operation was actually initiated (PUBLISH was sent)
+/// @details Sometimes due to message ordering configuration, 
+///     the requested "publish" operation can be paused. This API 
+///     call checks whether the @b PUBLISH message was already sent to the broker.
+/// @param[in] handle Handle returned by @ref cc_mqtt311_##NAME##client_publish_prepare() function.
+/// @return @b true in case @b PUBLISH message has already been sent.
+/// @ingroup publish
+bool cc_mqtt311_##NAME##client_publish_was_initiated(CC_Mqtt311PublishHandle handle);
+
 /// @brief Prepare, configure, and send "publish" request in one go
 /// @details Abstracts away sequence of the following functions invocation:
 ///     @li @ref cc_mqtt311_##NAME##client_publish_prepare()

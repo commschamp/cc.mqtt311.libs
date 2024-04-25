@@ -669,6 +669,15 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_cancel(CC_Mqtt311PublishHa
     return sendOpFromHandle(handle)->cancel();
 }
 
+bool cc_mqtt311_##NAME##client_publish_was_initiated(CC_Mqtt311PublishHandle handle)
+{
+    if (handle == nullptr) {
+        return false;
+    }    
+
+    return sendOpFromHandle(handle)->isPublished();
+}
+
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311PublishConfig* config,

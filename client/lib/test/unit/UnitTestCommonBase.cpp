@@ -92,6 +92,7 @@ UnitTestCommonBase::UnitTestCommonBase(const LibFuncs& funcs) :
     test_assert(m_funcs.m_publish_config != nullptr);      
     test_assert(m_funcs.m_publish_send != nullptr);  
     test_assert(m_funcs.m_publish_cancel != nullptr);  
+    test_assert(m_funcs.m_publish_was_initiated != nullptr);  
     test_assert(m_funcs.m_publish != nullptr);  
     test_assert(m_funcs.m_publish_set_ordering != nullptr);  
     test_assert(m_funcs.m_publish_get_ordering != nullptr);  
@@ -613,6 +614,11 @@ CC_Mqtt311ErrorCode UnitTestCommonBase::apiPublishConfig(CC_Mqtt311PublishHandle
 CC_Mqtt311ErrorCode UnitTestCommonBase::apiPublishCancel(CC_Mqtt311PublishHandle handle)
 {
     return m_funcs.m_publish_cancel(handle);
+}
+
+bool UnitTestCommonBase::apiPublishWasInitiated(CC_Mqtt311PublishHandle handle)
+{
+    return m_funcs.m_publish_was_initiated(handle);
 }
 
 CC_Mqtt311ErrorCode UnitTestCommonBase::apiPublishSetOrdering(CC_Mqtt311ClientHandle handle, CC_Mqtt311PublishOrdering ordering)
