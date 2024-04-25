@@ -1,0 +1,381 @@
+#include "UnitTestDefaultBase.h"
+#include "UnitTestProtocolDefs.h"
+
+#include <cxxtest/TestSuite.h>
+
+class UnitTestSubscribe : public CxxTest::TestSuite, public UnitTestDefaultBase
+{
+public:
+    void test1();
+    void test2();
+    void test3();
+    void test4();
+    void test5();
+    void test6();
+    
+
+private:
+    virtual void setUp() override
+    {
+        unitTestSetUp();
+    }
+
+    virtual void tearDown() override
+    {
+        unitTestTearDown();
+    }
+};
+
+void UnitTestSubscribe::test1()
+{
+    // Simple subscribe and ack
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto* tickReq = unitTestTickReq();
+    TS_ASSERT_EQUALS(tickReq->m_requested, 60000); // default keep alive
+
+
+    auto subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    const std::string SubTopic1 = "/sub/topic/1";
+    const CC_Mqtt311QoS SubQos1 = CC_Mqtt311QoS_AtLeastOnceDelivery;
+    auto subscribeConfig1 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig1);
+    TS_ASSERT_EQUALS(subscribeConfig1.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig1.m_topic = SubTopic1.c_str();
+    subscribeConfig1.m_maxQos = SubQos1;
+    auto ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig1);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    const std::string SubTopic2 = "/sub/topic/2";
+    const CC_Mqtt311QoS SubQos2 = CC_Mqtt311QoS_ExactlyOnceDelivery;
+    auto subscribeConfig2 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig2);
+    TS_ASSERT_EQUALS(subscribeConfig2.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig2.m_topic = SubTopic2.c_str();
+    subscribeConfig2.m_maxQos = SubQos2;
+    ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig2);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
+    TS_ASSERT_DIFFERS(subscribeMsg, nullptr);
+    TS_ASSERT_EQUALS(subscribeMsg->field_list().value().size(), 2U);
+    auto& elem0 = subscribeMsg->field_list().value()[0];
+    auto& elem1 = subscribeMsg->field_list().value()[1];
+    TS_ASSERT_EQUALS(elem0.field_topic().value(), SubTopic1);
+    TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(elem0.field_qos().value()), SubQos1);
+    TS_ASSERT_EQUALS(elem1.field_topic().value(), SubTopic2);
+    TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(elem1.field_qos().value()), SubQos2);
+
+    unitTestTick(client, 1000);
+    UnitTestSubackMsg subackMsg;
+    subackMsg.field_packetId().value() = subscribeMsg->field_packetId().value();
+    subackMsg.field_list().value().resize(2);
+    subackMsg.field_list().value()[0].setValue(CC_Mqtt311SubscribeReturnCode_SuccessQos1);
+    subackMsg.field_list().value()[1].setValue(CC_Mqtt311SubscribeReturnCode_SuccessQos2);
+    unitTestReceiveMessage(client, subackMsg);
+    TS_ASSERT(unitTestIsSubscribeComplete());
+
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
+    TS_ASSERT_EQUALS(subackInfo.m_response.m_returnCodes.size(), 2U);
+    TS_ASSERT_EQUALS(subackInfo.m_response.m_returnCodes[0], CC_Mqtt311SubscribeReturnCode_SuccessQos1);
+    TS_ASSERT_EQUALS(subackInfo.m_response.m_returnCodes[1], CC_Mqtt311SubscribeReturnCode_SuccessQos2);
+    unitTestPopSubscribeResponseInfo();
+}
+
+void UnitTestSubscribe::test2()
+{
+    // Parallel subscribe
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+    
+    auto* tickReq = unitTestTickReq();
+    TS_ASSERT_EQUALS(tickReq->m_requested, 60000); // Default keep alive
+
+    auto subscribe1 = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe1, nullptr);
+
+    const std::string SubTopic1 = "/sub/topic/1";
+    const CC_Mqtt311QoS SubQos1 = CC_Mqtt311QoS_AtLeastOnceDelivery;
+    auto subscribeConfig1 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig1);
+    TS_ASSERT_EQUALS(subscribeConfig1.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig1.m_topic = SubTopic1.c_str();
+    subscribeConfig1.m_maxQos = SubQos1;
+    auto ec = apiSubscribeConfigTopic(subscribe1, &subscribeConfig1);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe1);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg1 = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg1);
+    TS_ASSERT_EQUALS(sentMsg1->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg1 = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg1.get());
+    TS_ASSERT_DIFFERS(subscribeMsg1, nullptr);
+
+    auto subscribe2 = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe2, nullptr);
+
+    const std::string SubTopic2 = "/sub/topic/2";
+    const CC_Mqtt311QoS SubQos2 = CC_Mqtt311QoS_ExactlyOnceDelivery;
+    auto subscribeConfig2 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig2);
+    TS_ASSERT_EQUALS(subscribeConfig2.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig2.m_topic = SubTopic2.c_str();
+    subscribeConfig2.m_maxQos = SubQos2;
+    ec = apiSubscribeConfigTopic(subscribe2, &subscribeConfig2);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe2);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg2 = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg2);
+    TS_ASSERT_EQUALS(sentMsg2->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg2 = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg2.get());
+    TS_ASSERT_DIFFERS(subscribeMsg2, nullptr);
+    TS_ASSERT_DIFFERS(subscribeMsg1->field_packetId().value(), subscribeMsg2->field_packetId().value());
+    
+    unitTestTick(client, 1000);
+    UnitTestSubackMsg subackMsg1;
+    subackMsg1.field_packetId().value() = subscribeMsg1->field_packetId().value();
+    subackMsg1.field_list().value().resize(1);
+    subackMsg1.field_list().value()[0].setValue(CC_Mqtt311SubscribeReturnCode_Failure);
+    unitTestReceiveMessage(client, subackMsg1);
+    TS_ASSERT(unitTestIsSubscribeComplete());
+
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
+    TS_ASSERT_EQUALS(subackInfo.m_response.m_returnCodes.size(), 1U);
+    TS_ASSERT_EQUALS(subackInfo.m_response.m_returnCodes[0], CC_Mqtt311SubscribeReturnCode_Failure);
+    unitTestPopSubscribeResponseInfo();
+
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+    unitTestTick(client); // Timeout of the op
+    TS_ASSERT(unitTestIsSubscribeComplete());
+    auto& subackInfo2 = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo2.m_status, CC_Mqtt311AsyncOpStatus_Timeout);
+}
+
+void UnitTestSubscribe::test3()
+{
+    // Invalid subscribe topics
+
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    auto config = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&config);
+
+    config.m_topic = "++";
+    auto ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
+
+    config.m_topic = "#+";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);    
+
+    config.m_topic = "#/hello";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);     
+
+    config.m_topic = "hello+/bla";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);     
+
+    config.m_topic = "#hello";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);     
+
+    config.m_topic = "+hello";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);     
+
+    config.m_topic = "";
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);    
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_InsufficientConfig);
+}
+
+void UnitTestSubscribe::test4()
+{
+    // Testing invalid suback;
+
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto config = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&config);
+    TS_ASSERT_EQUALS(config.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    config.m_topic = "/sub/topic/1";
+
+    auto subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    auto ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
+    auto packetId = subscribeMsg->field_packetId().value();
+
+    unitTestTick(client, 1000);
+    UnitTestSubackMsg subackMsg;
+    subackMsg.field_packetId().setValue(packetId + 1U);
+    subackMsg.field_list().value().resize(1);
+    subackMsg.field_list().value()[0].setValue(CC_Mqtt311SubscribeReturnCode_SuccessQos2);
+    unitTestReceiveMessage(client, subackMsg);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    unitTestTick(client); // Timeout
+    TS_ASSERT(unitTestIsSubscribeComplete());
+
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_Timeout);
+    unitTestPopSubscribeResponseInfo();
+}
+
+void UnitTestSubscribe::test5()
+{
+    // Canceling subscribe operation when network is disconnected 
+
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto config = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&config);
+    TS_ASSERT_EQUALS(config.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    config.m_topic = "/sub/topic/1";
+
+    auto subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    const unsigned ResponseTimeout = 2000;
+    auto ec = apiSubscribeSetResponseTimeout(subscribe, ResponseTimeout);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = apiSubscribeConfigTopic(subscribe, &config);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
+    TS_ASSERT_DIFFERS(subscribeMsg, nullptr);
+
+    auto* tickReq = unitTestTickReq();
+    TS_ASSERT_EQUALS(tickReq->m_requested, ResponseTimeout);
+
+    unitTestTick(client, 1000);
+    apiNotifyNetworkDisconnected(client);
+    TS_ASSERT(!unitTestHasDisconnectInfo());
+
+    TS_ASSERT(unitTestIsSubscribeComplete());
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_BrokerDisconnected);
+    unitTestPopSubscribeResponseInfo();
+}
+
+void UnitTestSubscribe::test6()
+{
+    // Simple SUBACK with wrong number of reason codes
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    auto* tickReq = unitTestTickReq();
+    TS_ASSERT_EQUALS(tickReq->m_requested, 60000); // default keep alive
+
+    auto subscribe = apiSubscribePrepare(client, nullptr);
+    TS_ASSERT_DIFFERS(subscribe, nullptr);
+
+    const std::string SubTopic1 = "/sub/topic/1";
+    const CC_Mqtt311QoS SubQos1 = CC_Mqtt311QoS_AtLeastOnceDelivery;
+
+    auto subscribeConfig1 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig1);
+    TS_ASSERT_EQUALS(subscribeConfig1.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig1.m_topic = SubTopic1.c_str();
+    subscribeConfig1.m_maxQos = SubQos1;
+    auto ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig1);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    const std::string SubTopic2 = "/sub/topic/2";
+    const CC_Mqtt311QoS SubQos2 = CC_Mqtt311QoS_ExactlyOnceDelivery;
+    auto subscribeConfig2 = CC_Mqtt311SubscribeTopicConfig();
+    apiSubscribeInitConfigTopic(&subscribeConfig2);
+    TS_ASSERT_EQUALS(subscribeConfig2.m_maxQos, CC_Mqtt311QoS_ExactlyOnceDelivery);
+    subscribeConfig2.m_topic = SubTopic2.c_str();
+    subscribeConfig2.m_maxQos = SubQos2;
+    ec = apiSubscribeConfigTopic(subscribe, &subscribeConfig2);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
+    ec = unitTestSendSubscribe(subscribe);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+    TS_ASSERT(!unitTestIsSubscribeComplete());
+
+    auto sentMsg = unitTestGetSentMessage();
+    TS_ASSERT(sentMsg);
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Subscribe);    
+    auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
+    TS_ASSERT_DIFFERS(subscribeMsg, nullptr);
+    TS_ASSERT_EQUALS(subscribeMsg->field_list().value().size(), 2U);
+    auto& elem0 = subscribeMsg->field_list().value()[0];
+    auto& elem1 = subscribeMsg->field_list().value()[1];
+    TS_ASSERT_EQUALS(elem0.field_topic().value(), SubTopic1);
+    TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(elem0.field_qos().value()), SubQos1);
+    TS_ASSERT_EQUALS(elem1.field_topic().value(), SubTopic2);
+    TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(elem1.field_qos().value()), SubQos2);
+
+    unitTestTick(client, 1000);
+    UnitTestSubackMsg subackMsg;
+    subackMsg.field_packetId().value() = subscribeMsg->field_packetId().value();
+    subackMsg.field_list().value().resize(1);
+    subackMsg.field_list().value()[0].setValue(CC_Mqtt311SubscribeReturnCode_SuccessQos2);
+    unitTestReceiveMessage(client, subackMsg);
+    TS_ASSERT(unitTestIsSubscribeComplete());
+
+    auto& subackInfo = unitTestSubscribeResponseInfo();
+    TS_ASSERT_EQUALS(subackInfo.m_status, CC_Mqtt311AsyncOpStatus_ProtocolError);
+    unitTestPopSubscribeResponseInfo();
+}

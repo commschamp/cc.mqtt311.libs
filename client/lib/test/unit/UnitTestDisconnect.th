@@ -1,0 +1,57 @@
+#include "UnitTestDefaultBase.h"
+#include "UnitTestProtocolDefs.h"
+
+#include <cxxtest/TestSuite.h>
+
+class UnitTestDisconnect : public CxxTest::TestSuite, public UnitTestDefaultBase
+{
+public:
+    void test1();
+
+private:
+    virtual void setUp() override
+    {
+        unitTestSetUp();
+    }
+
+    virtual void tearDown() override
+    {
+        unitTestTearDown();
+    }
+};
+
+void UnitTestDisconnect::test1()
+{
+    // Testing rejection any operation (except connect) after disconnect
+
+    auto clientPtr = apiAllocClient();
+    auto* client = clientPtr.get();
+    TS_ASSERT_DIFFERS(client, nullptr);
+
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));
+
+    unitTestPerformDisconnect(client);
+
+    TS_ASSERT(!apiIsConnected(client));
+
+    CC_Mqtt311ErrorCode ec = CC_Mqtt311ErrorCode_Success;
+    auto* subscribe = apiSubscribePrepare(client, &ec);
+    TS_ASSERT_EQUALS(subscribe, nullptr);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
+
+    auto* unsubscribe = apiUnsubscribePrepare(client, &ec);
+    TS_ASSERT_EQUALS(unsubscribe, nullptr);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);    
+
+    auto* publish = apiPublishPrepare(client, &ec);
+    TS_ASSERT_EQUALS(publish, nullptr);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);       
+
+    auto* disconnect = apiDisconnectPrepare(client, &ec);
+    TS_ASSERT_EQUALS(disconnect, nullptr);
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);       
+
+    unitTestPerformBasicConnect(client, __FUNCTION__);
+    TS_ASSERT(apiIsConnected(client));    
+}
