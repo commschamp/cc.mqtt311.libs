@@ -3,5 +3,5 @@ if (NOT BUILD_TESTING)
     return ()
 endif ()
 
-#add_subdirectory(unit)
+add_subdirectory(unit)
 add_subdirectory(integration)
