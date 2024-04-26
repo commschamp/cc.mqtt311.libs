@@ -25,9 +25,6 @@ set (CC_MQTT311_CLIENT_BIN_DATA_FIELD_FIXED_LEN 512)
 # Limit the max "password" length
 set(CC_MQTT311_CLIENT_PASSWORD_FIELD_FIXED_LEN 50)
 
-# Limit the amount of properties per list
-set (CC_MQTT311_CLIENT_PROPERTIES_LIST_FIELD_FIXED_LEN 5)
-
 # Limit the length of the buffer required to store serialized message
 set (CC_MQTT311_CLIENT_MAX_OUTPUT_PACKET_SIZE 1024)
 
@@ -54,3 +51,6 @@ set (CC_MQTT311_CLIENT_HAS_SUB_TOPIC_VERIFICATION FALSE)
 
 # Limit the amount of topic filters to store when the subscription verification is enabled
 #set (CC_MQTT311_CLIENT_SUB_FILTERS_LIMIT 20)
+
+# Limit to QoS1
+set (CC_MQTT311_CLIENT_MAX_QOS 1)

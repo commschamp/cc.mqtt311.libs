@@ -235,6 +235,13 @@ void ConnectOp::handle(ConnackMsg& msg)
                 completeOpInternal(status, responsePtr);
             });
 
+    // Without this condition it can be unexpected behaviour to 
+    // cast return code value to CC_Mqtt311ConnectReturnCode.
+    if (ConnackMsg::Field_returnCode::ValueType::ValuesLimit <= msg.field_returnCode().value()) {
+        errorLog("Unknown connection return code");
+        return;
+    }
+
     comms::cast_assign(response.m_returnCode) = msg.field_returnCode().value();
     response.m_sessionPresent = msg.field_flags().getBitValue_sp();
 

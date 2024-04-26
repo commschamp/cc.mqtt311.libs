@@ -420,7 +420,7 @@ unsigned cc_mqtt311_##NAME##client_subscribe_get_response_timeout(CC_Mqtt311Subs
 void cc_mqtt311_##NAME##client_subscribe_init_config_topic(CC_Mqtt311SubscribeTopicConfig* config)
 {
     *config = CC_Mqtt311SubscribeTopicConfig();
-    config->m_maxQos = CC_Mqtt311QoS_ExactlyOnceDelivery;
+    config->m_maxQos = static_cast<decltype(config->m_maxQos)>(cc_mqtt311_client::Config::MaxQos);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_config_topic(CC_Mqtt311SubscribeHandle handle, const CC_Mqtt311SubscribeTopicConfig* config)

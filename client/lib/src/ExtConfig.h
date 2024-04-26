@@ -24,31 +24,38 @@ struct ExtConfig : public Config
     static constexpr unsigned DisconnectOpTimers = 0U;
     static constexpr unsigned SubscribeOpTimers = 1U;    
     static constexpr unsigned UnsubscribeOpTimers = 1U;    
-    static constexpr unsigned RecvOpsLimit = ReceiveMaxLimit == 0U ? 0U : ReceiveMaxLimit + 1U;
+    static constexpr unsigned RecvOpsLimit = MaxQos < 2 ? 1U : (ReceiveMaxLimit == 0U ? 0U : ReceiveMaxLimit + 1U);
     static constexpr unsigned RecvOpTimers = 1U;
     static constexpr unsigned SendOpsLimit = SendMaxLimit == 0U ? 0U : SendMaxLimit + 1U;
     static constexpr unsigned SendOpTimers = 1U;    
-    static constexpr unsigned ReauthOpsLimit = HasDynMemAlloc ? 0 : 1U;
-    static constexpr unsigned ReauthOpTimers = 1U;    
-    static constexpr unsigned TimersLimit = 
+    static constexpr bool HasOpsLimit = 
+        (ConnectOpsLimit > 0U) && 
+        (KeepAliveOpsLimit > 0U) &&
+        (DisconnectOpsLimit > 0U) &&
+        (SubscribeOpsLimit > 0U) &&
+        (UnsubscribeOpsLimit > 0U) &&
+        (RecvOpsLimit > 0U) &&
+        (SendOpsLimit > 0U);
+    static constexpr unsigned MaxTimersLimit = 
         (ConnectOpsLimit * ConnectOpTimers) + 
         (KeepAliveOpsLimit * KeepAliveOpTimers) + 
         (DisconnectOpsLimit * DisconnectOpTimers) + 
         (SubscribeOpsLimit * SubscribeOpTimers) +
         (UnsubscribeOpsLimit * UnsubscribeOpTimers) + 
         (RecvOpsLimit * RecvOpTimers) + 
-        (SendOpsLimit * SendOpTimers) +
-        (ReauthOpsLimit * ReauthOpTimers);
+        (SendOpsLimit * SendOpTimers);
+    static constexpr unsigned TimersLimit = HasOpsLimit ? MaxTimersLimit : 0U;
 
-    static const unsigned OpsLimit = 
+    static const unsigned MaxOpsLimit = 
         ConnectOpsLimit + 
         KeepAliveOpsLimit + 
         DisconnectOpsLimit + 
         SubscribeOpsLimit + 
         UnsubscribeOpsLimit + 
         RecvOpsLimit + 
-        SendOpsLimit + 
-        ReauthOpsLimit;
+        SendOpsLimit;
+
+    static const unsigned OpsLimit = HasOpsLimit ? MaxOpsLimit : 0U;
 
     static const unsigned PacketIdsLimitSumTmp = 
         SubscribeOpsLimit + 
@@ -62,7 +69,6 @@ struct ExtConfig : public Config
     static_assert(HasDynMemAlloc || (KeepAliveOpsLimit > 0U));
     static_assert(HasDynMemAlloc || (RecvOpsLimit > 0U));
     static_assert(HasDynMemAlloc || (SendOpsLimit > 0U));
-    static_assert(HasDynMemAlloc || (ReauthOpsLimit > 0U));
     static_assert(HasDynMemAlloc || (OpsLimit > 0U));
     static_assert(HasDynMemAlloc || (PacketIdsLimit > 0U));
 };

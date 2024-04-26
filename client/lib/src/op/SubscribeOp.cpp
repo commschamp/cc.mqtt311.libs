@@ -199,6 +199,15 @@ void SubscribeOp::handle(SubackMsg& msg)
             return;
         }
 
+        // Without this condition it can be unexpected behaviour to 
+        // cast return code value to CC_Mqtt311SubscribeReturnCode.
+        using RetCodeType = SubackMsg::Field_list::ValueType::value_type::ValueType;
+        if ((RetCodeType::Qos2 < rc.value()) && 
+            (RetCodeType::Failure != rc.value())) {
+            errorLog("Invalid return code in SUBACK");
+            return;
+        }
+
         auto rcCasted = static_cast<CC_Mqtt311SubscribeReturnCode>(rc.value());
 
         if ((CC_Mqtt311SubscribeReturnCode_SuccessQos0 <= rcCasted) && 
