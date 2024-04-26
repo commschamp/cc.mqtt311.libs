@@ -937,6 +937,7 @@ op::SendOp* ClientImpl::findSendOp(std::uint16_t packetId)
             m_sendOps.begin(), m_sendOps.end(),
             [packetId](auto& opPtr)
             {
+                COMMS_ASSERT(opPtr);
                 return opPtr->packetId() == packetId;
             });
 
@@ -973,11 +974,25 @@ bool ClientImpl::isLegitSendAck(const op::SendOp* sendOp, bool pubcompAck) const
 
 void ClientImpl::resendAllUntil(op::SendOp* sendOp)
 {
-    for (auto& sendOpPtr : m_sendOps) {
-        sendOpPtr->forceDupResend();
-        if (sendOpPtr.get() == sendOp) {
+    // Do index controlled iteration because forcing dup resend can
+    // cause early message destruction.
+    for (auto idx = 0U; idx < m_sendOps.size();) {
+        auto& sendOpPtr = m_sendOps[idx];
+        COMMS_ASSERT(sendOpPtr);
+        auto* opBeforeResend = sendOpPtr.get();
+        sendOpPtr->forceDupResend(); // can destruct object
+        if (opBeforeResend == sendOp) {
             break;
         }
+
+        auto* opAfterResend = sendOpPtr.get();
+        if (opBeforeResend != opAfterResend) {
+            // The op object was destructed and erased, 
+            // do not increment index;
+            continue;
+        }
+
+        ++idx;
     }
 }
 
