@@ -51,13 +51,6 @@ void printQos(const char* prefix, CC_Mqtt311QoS val)
     std::cout << "\t" << prefix << ": " << toString(val) << '\n';
 }
 
-void printString(const char* prefix, const char* val)
-{
-    if (val != nullptr) {
-        std::cout << '\t' << prefix << ": " << val << '\n';
-    }
-}
-
 void printBool(const char* prefix, bool val)
 {
     std::cout << '\t' << prefix << ": " << std::boolalpha << val << '\n';
