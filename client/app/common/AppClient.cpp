@@ -51,29 +51,6 @@ void printQos(const char* prefix, CC_Mqtt311QoS val)
     std::cout << "\t" << prefix << ": " << toString(val) << '\n';
 }
 
-void printString(const char* prefix, const char* val)
-{
-    if (val != nullptr) {
-        std::cout << '\t' << prefix << ": " << val << '\n';
-    }
-}
-
-void printData(const char* prefix, const std::uint8_t* data, unsigned dataLen)
-{
-    if (dataLen == 0U) {
-        return;
-    }
-
-    std::cout << '\t' << prefix << ": " << AppClient::toString(data, dataLen) << '\n';
-}
-
-void printUnsigned(const char* prefix, unsigned val, unsigned ignoreValue = 0U, bool forcePrint = false)
-{
-    if (forcePrint || (val != ignoreValue)) {
-        std::cout << '\t' << prefix << ": " << val << '\n';
-    }
-}
-
 void printBool(const char* prefix, bool val)
 {
     std::cout << '\t' << prefix << ": " << std::boolalpha << val << '\n';
