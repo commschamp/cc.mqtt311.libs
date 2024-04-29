@@ -58,15 +58,6 @@ void printString(const char* prefix, const char* val)
     }
 }
 
-void printData(const char* prefix, const std::uint8_t* data, unsigned dataLen)
-{
-    if (dataLen == 0U) {
-        return;
-    }
-
-    std::cout << '\t' << prefix << ": " << AppClient::toString(data, dataLen) << '\n';
-}
-
 void printBool(const char* prefix, bool val)
 {
     std::cout << '\t' << prefix << ": " << std::boolalpha << val << '\n';
