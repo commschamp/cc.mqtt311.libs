@@ -7,14 +7,6 @@
 
 #pragma once
 
-#include "ExtConfig.h"
-#include "ObjListType.h"
-#include "ProtocolDefs.h"
-
-#include "cc_mqtt311_client/common.h"
-
-#include <cstdint>
-
 namespace cc_mqtt311_client
 {
 

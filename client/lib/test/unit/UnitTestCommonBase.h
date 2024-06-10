@@ -21,7 +21,6 @@ public:
     {
         CC_Mqtt311ClientHandle (*m_alloc)() = nullptr;
         void (*m_free)(CC_Mqtt311ClientHandle) = nullptr;
-        CC_Mqtt311ErrorCode (*m_init)(CC_Mqtt311ClientHandle) = nullptr;
         void (*m_tick)(CC_Mqtt311ClientHandle, unsigned) = nullptr;
         unsigned (*m_process_data)(CC_Mqtt311ClientHandle, const unsigned char*, unsigned) = nullptr;
         void (*m_notify_network_disconnected)(CC_Mqtt311ClientHandle) = nullptr;
