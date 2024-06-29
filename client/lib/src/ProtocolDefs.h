@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-static_assert(CC_MQTT311_VERSION <= COMMS_MAKE_VERSION(2, 7, 0), 
+static_assert(COMMS_MAKE_VERSION(2, 7, 0) <= CC_MQTT311_VERSION, 
     "The version of the cc_mqtt311 library is too low.");
 
 namespace cc_mqtt311_client
