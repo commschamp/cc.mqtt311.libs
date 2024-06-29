@@ -563,7 +563,6 @@ void ClientImpl::handle(PubcompMsg& msg)
 
 void ClientImpl::handle(ProtMessage& msg)
 {
-    static_cast<void>(msg);
     if (m_sessionState.m_disconnecting) {
         return;
     }

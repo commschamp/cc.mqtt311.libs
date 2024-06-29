@@ -23,7 +23,6 @@ struct ClientState
     using PacketIdsList = ObjListType<std::uint16_t, ExtConfig::PacketIdsLimit>;
 
     static constexpr unsigned DefaultKeepAlive = 60;
-    static constexpr unsigned DefaultTopicAliasMax = 10;
 
     PacketIdsList m_allocatedPacketIds;
     std::uint16_t m_lastPacketId = 0U;

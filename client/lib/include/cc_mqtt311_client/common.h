@@ -12,20 +12,21 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else // #ifdef __cplusplus
 #include <stdbool.h>
 #endif // #ifdef __cplusplus
 
 /// @brief Major verion of the library
 /// @ingroup global
-#define CC_MQTT311_CLIENT_MAJOR_VERSION 0U
+#define CC_MQTT311_CLIENT_MAJOR_VERSION 1U
 
 /// @brief Minor verion of the library
 /// @ingroup global
-#define CC_MQTT311_CLIENT_MINOR_VERSION 1U
+#define CC_MQTT311_CLIENT_MINOR_VERSION 0U
 
 /// @brief Patch level of the library
 /// @ingroup global
-#define CC_MQTT311_CLIENT_PATCH_VERSION 1U
+#define CC_MQTT311_CLIENT_PATCH_VERSION 0U
 
 /// @brief Macro to create numeric version as single unsigned number
 /// @ingroup global
@@ -134,7 +135,7 @@ struct CC_Mqtt311Client;
 /// @brief Handle used to access client specific data structures.
 /// @details Returned by cc_mqtt311_client_alloc() function.
 /// @ingroup client
-typedef CC_Mqtt311Client* CC_Mqtt311ClientHandle;
+typedef struct CC_Mqtt311Client* CC_Mqtt311ClientHandle;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311ConnectHandle
 /// @ingroup connect
@@ -143,7 +144,7 @@ struct CC_Mqtt311Connect;
 /// @brief Handle for "connect" operation.
 /// @details Returned by cc_mqtt311_client_connect_prepare() function.
 /// @ingroup connect
-typedef CC_Mqtt311Connect* CC_Mqtt311ConnectHandle;
+typedef struct CC_Mqtt311Connect* CC_Mqtt311ConnectHandle;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311DisconnectHandle
 /// @ingroup disconnect
@@ -152,7 +153,7 @@ struct CC_Mqtt311Disconnect;
 /// @brief Handle for "disconnect" operation.
 /// @details Returned by cc_mqtt311_client_disconnect_prepare() function.
 /// @ingroup disconnect
-typedef CC_Mqtt311Disconnect* CC_Mqtt311DisconnectHandle;
+typedef struct CC_Mqtt311Disconnect* CC_Mqtt311DisconnectHandle;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311SubscribeHandle
 /// @ingroup subscribe
@@ -161,7 +162,7 @@ struct CC_Mqtt311Subscribe;
 /// @brief Handle for "subscribe" operation.
 /// @details Returned by cc_mqtt311_client_subscribe_prepare() function.
 /// @ingroup subscribe
-typedef CC_Mqtt311Subscribe* CC_Mqtt311SubscribeHandle;
+typedef struct CC_Mqtt311Subscribe* CC_Mqtt311SubscribeHandle;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311UnsubscribeHandle
 /// @ingroup unsubscribe
@@ -170,7 +171,7 @@ struct CC_Mqtt311Unsubscribe;
 /// @brief Handle for "unsubscribe" operation.
 /// @details Returned by cc_mqtt311_client_unsubscribe_prepare() function.
 /// @ingroup unsubscribe
-typedef CC_Mqtt311Unsubscribe* CC_Mqtt311UnsubscribeHandle;
+typedef struct CC_Mqtt311Unsubscribe* CC_Mqtt311UnsubscribeHandle;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311PublishHandle
 /// @ingroup publish
@@ -179,7 +180,7 @@ struct CC_Mqtt311Publish;
 /// @brief Handle for "publish" operation.
 /// @details Returned by cc_mqtt311_client_publish_prepare() function.
 /// @ingroup publish
-typedef CC_Mqtt311Publish* CC_Mqtt311PublishHandle;
+typedef struct CC_Mqtt311Publish* CC_Mqtt311PublishHandle;
 
 /// @brief Configuration structure to be passed to the @b cc_mqtt311_client_connect_config().
 /// @see @b cc_mqtt311_client_connect_init_config()
