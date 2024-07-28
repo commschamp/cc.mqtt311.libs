@@ -517,7 +517,7 @@
 /// }
 /// @endcode
 ///
-/// @subsection doc_cc_mqtt311_client_disconnect_simplify Simplifying the "Disonnect" Operation Preparation.
+/// @subsection doc_cc_mqtt311_client_disconnect_simplify Simplifying the "Disconnect" Operation Preparation.
 /// In many use cases the "disconnect" operation can be quite simple.
 /// To simplify the sequence of the operation preparation and handling of errors,
 /// the library provides wrapper function(s) that can be used:
