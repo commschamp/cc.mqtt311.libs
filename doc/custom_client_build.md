@@ -167,7 +167,7 @@ set(CC_MQTT311_CLIENT_PASSWORD_FIELD_FIXED_LEN 50)
 
 ---
 ### CC_MQTT311_CLIENT_MAX_OUTPUT_PACKET_SIZE
-When serialiazing the output message the client library needs to allocate an output
+When serializing the output message the client library needs to allocate an output
 buffer. When set to **0** (default), the output buffer type will be dynamic sized
 `std::vector<std::uint8_t>`. When the non-**0** value is assigned to the variable, the
 [comms::util::StaticVector](https://github.com/commschamp/comms/blob/master/include/comms/util/StaticVector.h)
