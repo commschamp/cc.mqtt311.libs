@@ -517,7 +517,7 @@
 /// }
 /// @endcode
 ///
-/// @subsection doc_cc_mqtt311_client_disconnect_simplify Simplifying the "Disonnect" Operation Preparation.
+/// @subsection doc_cc_mqtt311_client_disconnect_simplify Simplifying the "Disconnect" Operation Preparation.
 /// In many use cases the "disconnect" operation can be quite simple.
 /// To simplify the sequence of the operation preparation and handling of errors,
 /// the library provides wrapper function(s) that can be used:
@@ -1138,7 +1138,6 @@
 /// @li Invokes the @ref doc_cc_mqtt311_client_callbacks_broker_disconnect "disconnection report callback"
 ///     registered using the @b cc_mqtt311_client_set_broker_disconnect_report_callback() function
 ///     reporting @ref CC_Mqtt311BrokerDisconnectReason_NoBrokerResponse as the disconnection reason.
-///     without any disconnection information.
 ///
 /// @subsection doc_cc_mqtt311_client_unsolicited_disconnect_protocol_error Detecting Protocol Error
 /// In case the broker doesn't fully comply with the MQTT v3.1.1 specification or there is
@@ -1151,7 +1150,6 @@
 /// @li Invokes the @ref doc_cc_mqtt311_client_callbacks_broker_disconnect "disconnection report callback"
 ///     registered using the @b cc_mqtt311_client_set_broker_disconnect_report_callback() function
 ///     reporting @ref CC_Mqtt311BrokerDisconnectReason_ProtocolError as the disconnection reason.
-///     without any disconnection information.
 ///
 /// With all said above it means that if application receives @ref CC_Mqtt311AsyncOpStatus_ProtocolError or
 /// @ref CC_Mqtt311AsyncOpStatus_BrokerDisconnected status in the operation callback, then
