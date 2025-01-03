@@ -11,12 +11,12 @@
 
 #include "comms/util/ScopeGuard.h"
 
-struct CC_Mqtt311Client {};
-struct CC_Mqtt311Connect {};
-struct CC_Mqtt311Disconnect {};
-struct CC_Mqtt311Subscribe {};
-struct CC_Mqtt311Unsubscribe {};
-//struct CC_Mqtt311Publish {};
+struct alignas(alignof(cc_mqtt311_client::ClientImpl)) CC_Mqtt311Client {};
+struct alignas(alignof(cc_mqtt311_client::op::ConnectOp)) CC_Mqtt311Connect {};
+struct alignas(alignof(cc_mqtt311_client::op::DisconnectOp)) CC_Mqtt311Disconnect {};
+struct alignas(alignof(cc_mqtt311_client::op::SubscribeOp)) CC_Mqtt311Subscribe {};
+struct alignas(alignof(cc_mqtt311_client::op::UnsubscribeOp)) CC_Mqtt311Unsubscribe {};
+struct alignas(alignof(cc_mqtt311_client::op::SendOp)) CC_Mqtt311Publish {};
 
 namespace
 {
