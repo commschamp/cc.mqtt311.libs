@@ -1,6 +1,11 @@
 name: Github Actions Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
 
 env:
   COMMS_TAG: v5.2.7
@@ -284,7 +289,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        type: [Debug, Release, MinSizeRel]
+        type: [Debug, Release]
         arch: [Win32, x64]
         cpp: [17]
 
@@ -343,7 +348,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        type: [Debug, Release, MinSizeRel]
+        type: [Debug, Release]
         arch: [Win32, x64]
         cpp: [17, 20]
 
