@@ -58,41 +58,58 @@ endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_BIN_DATA_FIELD_FIXED_LEN} EQUAL 0)
     set (FIELD_BIN_DATA "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_BIN_DATA_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_BIN_DATA_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_STRING_FIELD_FIXED_LEN} EQUAL 0)
     set (FIELD_STRING "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_STRING_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_STRING_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_MAX_OUTPUT_PACKET_SIZE} EQUAL 0)
     set (MAX_PACKET_SIZE "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_MAX_OUTPUT_PACKET_SIZE}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_MAX_OUTPUT_PACKET_SIZE needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_CLIENT_ID_FIELD_FIXED_LEN} EQUAL 0)
     set (MESSAGE_CONNECT_FIELDS_CLIENT_ID "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_CLIENT_ID_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_CLIENT_ID_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_USERNAME_FIELD_FIXED_LEN} EQUAL 0)
     set (MESSAGE_CONNECT_FIELDS_USERNAME "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_USERNAME_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_USERNAME_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_PASSWORD_FIELD_FIXED_LEN} EQUAL 0)
     set (MESSAGE_CONNECT_FIELDS_PASSWORD "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_PASSWORD_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_PASSWORD_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_TOPIC_FIELD_FIXED_LEN} EQUAL 0)
     set (FIELD_TOPIC "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_TOPIC_FIELD_FIXED_LEN}>")    
     set (MESSAGE_CONNECT_FIELDS_WILL_TOPIC "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_TOPIC_FIELD_FIXED_LEN}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_TOPIC_FIELD_FIXED_LEN needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_ASYNC_SUBS_LIMIT} EQUAL 0)
     set (MESSAGE_SUBSCRIBE_FIELDS_LIST "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_ASYNC_SUBS_LIMIT}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_ASYNC_SUBS_LIMIT needs to be set")    
 endif ()
 
 if (NOT ${CC_MQTT311_CLIENT_ASYNC_UNSUBS_LIMIT} EQUAL 0)
     set (MESSAGE_UNSUBSCRIBE_FIELDS_LIST "comms::option::app::FixedSizeStorage<${CC_MQTT311_CLIENT_ASYNC_UNSUBS_LIMIT}>")
+elseif (NOT CC_MQTT311_CLIENT_HAS_DYN_MEM_ALLOC)
+    message (FATAL_ERROR "When dynamic memory allocation is disabled, the CC_MQTT311_CLIENT_ASYNC_UNSUBS_LIMIT needs to be set")    
 endif ()
-
 
 #########################################
 

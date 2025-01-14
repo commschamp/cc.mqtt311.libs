@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2024 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-static_assert(COMMS_MAKE_VERSION(2, 9, 0) <= CC_MQTT311_VERSION, 
+static_assert(COMMS_MAKE_VERSION(3, 0, 0) <= CC_MQTT311_VERSION, 
     "The version of the cc_mqtt311 library is too low.");
 
 namespace cc_mqtt311_client
