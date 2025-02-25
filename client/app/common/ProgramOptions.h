@@ -28,12 +28,14 @@ public:
     enum ConnectionType
     {
         ConnectionType_Tcp,
+        ConnectionType_Tls,
         ConnectionType_ValuesLimit
     };
 
     void addCommon();
     void addConnect();
     void addNetwork(std::uint16_t port = DefaultPort);
+    void addTls();
     void addPublish();
     void addSubscribe();
 
@@ -46,6 +48,17 @@ public:
     bool verbose() const;
     ConnectionType connectionType() const;
 
+    // Network Options
+    std::string networkAddress() const;
+    std::uint16_t networkPort() const;    
+
+    // TLS Options
+    bool isTls() const;
+    std::string tlsCa() const;
+    std::string tlsPrivateKey() const;
+    std::string tlsPrivateKeyPass() const;
+    std::string tlsCert() const;    
+
     // Connect Options
     std::string clientId() const;
     std::string username() const;
@@ -55,10 +68,6 @@ public:
     std::string willMessage() const;
     unsigned willQos() const;
     bool willRetain() const;
-
-    // Network Options
-    std::string networkAddress() const;
-    std::uint16_t networkPort() const;
 
     // Publish Options
     std::string pubTopic() const;
