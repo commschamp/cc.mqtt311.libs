@@ -13,8 +13,6 @@ int main(int argc, const char* argv[])
         return -1;
     }
 
-    // TODO: generate input
-
     cc_mqtt311_client_afl_fuzz::Logger logger;
     if (!logger.open(opts)) {
         return -1;
