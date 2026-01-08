@@ -231,14 +231,14 @@ jobs:
       shell: bash
       run: ctest -V
 
-  build_msvc_2019:
-    runs-on: windows-2019
+  build_msvc_2022:
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
         type: [Debug, Release]
         arch: [Win32, x64]
-        cpp: [17]
+        cpp: [17, 20]
 
     steps:
     - uses: actions/checkout@v4
@@ -250,14 +250,14 @@ jobs:
       if: matrix.arch == 'x64'
       shell: cmd
       run: |
-        choco install boost-msvc-14.2 --version=${{env.WIN_BOOST_VERSION}}      
-        echo BOOST_DIR=${{env.WIN_BOOST_DIR}}/lib64-msvc-14.2/cmake >>%GITHUB_ENV%   
+        choco install boost-msvc-14.3 --version=${{env.WIN_BOOST_VERSION}}      
+        echo BOOST_DIR=${{env.WIN_BOOST_DIR}}/lib64-msvc-14.3/cmake >>%GITHUB_ENV%
 
     - name: Install OpenSSL
       if: matrix.arch == 'x64'
       shell: cmd
       run: |
-        choco install openssl --version=${{env.WIN_OPENSSL_VERSION}} 
+        choco install openssl --version=${{env.WIN_OPENSSL_VERSION}}         
 
     - name: Prepare externals
       shell: cmd
@@ -297,14 +297,14 @@ jobs:
       shell: cmd
       run: ctest -V
 
-  build_msvc_2022:
-    runs-on: windows-2022
+  build_msvc_2025:
+    runs-on: windows-2025
     strategy:
       fail-fast: false
       matrix:
         type: [Debug, Release]
         arch: [Win32, x64]
-        cpp: [17, 20]
+        cpp: [17, 20, 23]
 
     steps:
     - uses: actions/checkout@v4
