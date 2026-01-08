@@ -50,14 +50,14 @@ public:
 
     // Network Options
     std::string networkAddress() const;
-    std::uint16_t networkPort() const;    
+    std::uint16_t networkPort() const;
 
     // TLS Options
     bool isTls() const;
     std::string tlsCa() const;
     std::string tlsPrivateKey() const;
     std::string tlsPrivateKeyPass() const;
-    std::string tlsCert() const;    
+    std::string tlsCert() const;
 
     // Connect Options
     std::string clientId() const;

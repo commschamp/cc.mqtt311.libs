@@ -20,7 +20,7 @@ protected:
     {
         std::cerr << "ERROR: Unexpected disconnection from broker" << std::endl;
         failTestInternal();
-    }  
+    }
 
     virtual void integrationTestConnectCompleteImpl(CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311ConnectResponse* response) override
     {
@@ -33,12 +33,12 @@ protected:
         if (response == nullptr) {
             std::cerr << "ERROR: connection response is not provided" << std::endl;
             failTestInternal();
-            return;            
+            return;
         }
 
         if (response->m_returnCode != CC_Mqtt311ConnectReturnCode_Accepted) {
             failTestInternal();
-            return; 
+            return;
         }
 
         integrationTestPrintConnectResponse(*response);
@@ -47,24 +47,22 @@ protected:
         if (ec != CC_Mqtt311ErrorCode_Success) {
             std::cerr << "ERROR: Failed to send disconnect" << std::endl;
             failTestInternal();
-            return;             
+            return;
         }
 
         io().stop();
     }
-
 
 private:
     void failTestInternal()
     {
         assert(0);
         m_exitCode = -1;
-        io().stop();        
+        io().stop();
     }
 
-    int& m_exitCode;    
+    int& m_exitCode;
 };
-
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
 {
@@ -100,7 +98,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
             std::cerr << "ERROR: Failed to configure connect" << std::endl;
             return -1;
         }
-        
+
         ec = test.integrationTestSendConnect(connect);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             std::cerr << "ERROR: Failed to send connect" << std::endl;

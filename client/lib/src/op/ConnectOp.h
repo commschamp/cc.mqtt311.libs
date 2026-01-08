@@ -34,7 +34,7 @@ public:
     virtual void handle(ConnackMsg& msg) override;
 
 protected:
-    virtual Type typeImpl() const override;    
+    virtual Type typeImpl() const override;
     virtual void terminateOpImpl(CC_Mqtt311AsyncOpStatus status) override;
     virtual void connectivityChangedImpl() override;
 
@@ -45,8 +45,8 @@ private:
 
     static void opTimeoutCb(void* data);
 
-    ConnectMsg m_connectMsg;  
-    TimerMgr::Timer m_timer;  
+    ConnectMsg m_connectMsg;
+    TimerMgr::Timer m_timer;
     CC_Mqtt311ConnectCompleteCb m_cb = nullptr;
     void* m_cbData = nullptr;
 
@@ -54,6 +54,5 @@ private:
 };
 
 } // namespace op
-
 
 } // namespace cc_mqtt311_client

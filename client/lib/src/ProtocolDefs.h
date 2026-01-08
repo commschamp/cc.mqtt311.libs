@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-static_assert(COMMS_MAKE_VERSION(3, 0, 5) <= CC_MQTT311_VERSION, 
+static_assert(COMMS_MAKE_VERSION(3, 0, 5) <= CC_MQTT311_VERSION,
     "The version of the cc_mqtt311 library is too low.");
 
 namespace cc_mqtt311_client
@@ -59,9 +59,9 @@ using Qos0ClientInputMessages =
         cc_mqtt311::message::Unsuback<TBase, TOpt>,
         cc_mqtt311::message::Pingresp<TBase, TOpt>,
         cc_mqtt311::message::Disconnect<TBase, TOpt>
-    >; 
+    >;
 
-using ProtInputMessages = 
+using ProtInputMessages =
     std::conditional_t<
         2 <= Config::MaxQos,
         cc_mqtt311::input::ClientInputMessages<ProtMessage, ProtocolOptions>,

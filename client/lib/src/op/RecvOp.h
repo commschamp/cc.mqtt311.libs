@@ -30,7 +30,7 @@ public:
 
 #if CC_MQTT311_CLIENT_MAX_QOS >= 2
     void handle(PubrelMsg& msg) override;
-#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 2    
+#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 2
 
     unsigned packetId() const
     {
@@ -41,7 +41,7 @@ public:
     void postReconnectionResume();
 
 protected:
-    virtual Type typeImpl() const override;    
+    virtual Type typeImpl() const override;
     virtual void connectivityChangedImpl() override;
 
 private:
@@ -50,13 +50,12 @@ private:
 
     static void recvTimeoutCb(void* data);
 
-    TimerMgr::Timer m_responseTimer;  
+    TimerMgr::Timer m_responseTimer;
     unsigned m_packetId = 0U;
 
     static_assert(ExtConfig::RecvOpTimers == 1U);
 };
 
 } // namespace op
-
 
 } // namespace cc_mqtt311_client

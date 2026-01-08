@@ -32,7 +32,7 @@ public:
     virtual void handle(ProtMessage& msg) override;
 
 protected:
-    virtual Type typeImpl() const override;    
+    virtual Type typeImpl() const override;
 
 private:
     void restartPingTimer();
@@ -45,13 +45,12 @@ private:
     static void pingTimeoutCb(void* data);
 
     TimerMgr::Timer m_pingTimer;
-    TimerMgr::Timer m_recvTimer;  
-    TimerMgr::Timer m_respTimer;  
+    TimerMgr::Timer m_recvTimer;
+    TimerMgr::Timer m_respTimer;
 
     static_assert(ExtConfig::KeepAliveOpTimers == 3U);
 };
 
 } // namespace op
-
 
 } // namespace cc_mqtt311_client

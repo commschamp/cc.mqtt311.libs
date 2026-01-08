@@ -4,11 +4,11 @@
 #include <cstring>
 #include <iostream>
 
-namespace 
+namespace
 {
 
 const std::string DefaultHost("127.0.0.1");
-const std::string DefaultPort("1883");    
+const std::string DefaultPort("1883");
 
 IntegrationTestCommonBase* asObj(void* data)
 {
@@ -23,7 +23,7 @@ std::ostream& errorLog(const std::string& name)
     }
 
     return std::cerr;
-}    
+}
 
 std::ostream& infoLog(const std::string& name)
 {
@@ -33,10 +33,9 @@ std::ostream& infoLog(const std::string& name)
     }
 
     return std::cout;
-}    
+}
 
-} // namespace 
-
+} // namespace
 
 IntegrationTestCommonBase::IntegrationTestCommonBase(boost::asio::io_context& io, const std::string& clientId) :
     m_io(io),
@@ -65,7 +64,7 @@ bool IntegrationTestCommonBase::integrationTestStart()
 
     boost::system::error_code ioEc;
     boost::asio::ip::tcp::resolver resolver(m_io);
-    boost::asio::connect(m_socket, resolver.resolve(m_host, m_port), ioEc);    
+    boost::asio::connect(m_socket, resolver.resolve(m_host, m_port), ioEc);
     if (ioEc) {
         errorLog(m_clientId) << "Failed to connect to " << m_host << ":" << m_port << " with error: " << ioEc.message() << std::endl;
         return false;
@@ -133,12 +132,12 @@ bool IntegrationTestCommonBase::integrationTestStartBasicConnect(bool cleanSessi
         errorLog(m_clientId) << "Failed to configure connect" << std::endl;
         return false;
     }
-    
+
     ec = integrationTestSendConnect(connect);
     if (ec != CC_Mqtt311ErrorCode_Success) {
         errorLog(m_clientId) << "Failed to send connect" << std::endl;
         return false;
-    } 
+    }
 
     integrationTestInfoLog() << "Sent connect request" << std::endl;
     return true;
@@ -166,7 +165,7 @@ bool IntegrationTestCommonBase::integrationTestStartBasicSubscribe(const char* t
     if (ec != CC_Mqtt311ErrorCode_Success) {
         integrationTestErrorLog() << "Failed to send subscribe" << std::endl;
         return false;
-    }     
+    }
 
     integrationTestInfoLog() << "Sent subscribe to " << topic << std::endl;
     return true;
@@ -198,7 +197,7 @@ bool IntegrationTestCommonBase::integrationTestStartBasicPublish(const char* top
     if (ec != CC_Mqtt311ErrorCode_Success) {
         integrationTestErrorLog() << "Failed to send publish." << std::endl;
         return false;
-    }     
+    }
 
     integrationTestInfoLog() << "Sent publish of " << topic << std::endl;
     return true;
@@ -210,7 +209,7 @@ bool IntegrationTestCommonBase::integrationTestStartBasicDisconnect()
     auto ec = ::cc_mqtt311_client_disconnect(client);
     if (ec != CC_Mqtt311ErrorCode_Success) {
         integrationTestErrorLog() << "Failed to send disconnect" << std::endl;
-        return false;             
+        return false;
     }
 
     return true;
@@ -225,12 +224,12 @@ bool IntegrationTestCommonBase::integrationTestVerifyConnectSuccessful(CC_Mqtt31
 
     if (response == nullptr) {
         integrationTestErrorLog() << "Connection response is not provided" << std::endl;
-        return false;            
+        return false;
     }
 
     if (response->m_returnCode != CC_Mqtt311ConnectReturnCode_Accepted) {
         integrationTestErrorLog() << "Unexpected connection return code: " << response->m_returnCode << std::endl;
-        return false; 
+        return false;
     }
 
     integrationTestInfoLog() << "Connection successful" << std::endl;
@@ -238,9 +237,9 @@ bool IntegrationTestCommonBase::integrationTestVerifyConnectSuccessful(CC_Mqtt31
 }
 
 bool IntegrationTestCommonBase::integrationTestVerifySubscribeSuccessful(
-    [[maybe_unused]] CC_Mqtt311SubscribeHandle handle, 
-    CC_Mqtt311AsyncOpStatus status, 
-    const CC_Mqtt311SubscribeResponse* response, 
+    [[maybe_unused]] CC_Mqtt311SubscribeHandle handle,
+    CC_Mqtt311AsyncOpStatus status,
+    const CC_Mqtt311SubscribeResponse* response,
     unsigned returnCodesCount)
 {
     if (status != CC_Mqtt311AsyncOpStatus_Complete) {
@@ -250,19 +249,19 @@ bool IntegrationTestCommonBase::integrationTestVerifySubscribeSuccessful(
 
     if (response == nullptr) {
         integrationTestErrorLog() << "Subscription response is not provided" << std::endl;
-        return false;            
+        return false;
     }
 
     if (response->m_returnCodesCount != returnCodesCount) {
         integrationTestErrorLog() << "Unexpected amount of susbscription return codes: " << response->m_returnCodesCount << std::endl;
-        return false; 
+        return false;
     }
 
     for (auto idx = 0U; idx < response->m_returnCodesCount; ++idx) {
         if (response->m_returnCodes[idx] > CC_Mqtt311SubscribeReturnCode_SuccessQos2) {
             integrationTestErrorLog() << "Unexpected subscription return code idx=" << idx << ": " << response->m_returnCodes[0] << std::endl;
-            return false; 
-        }        
+            return false;
+        }
     }
 
     integrationTestInfoLog() << "Subscription successful" << std::endl;
@@ -270,7 +269,7 @@ bool IntegrationTestCommonBase::integrationTestVerifySubscribeSuccessful(
 }
 
 bool IntegrationTestCommonBase::integrationTestVerifyPublishSuccessful(
-    [[maybe_unused]] CC_Mqtt311PublishHandle handle, 
+    [[maybe_unused]] CC_Mqtt311PublishHandle handle,
     CC_Mqtt311AsyncOpStatus status)
 {
     if (status != CC_Mqtt311AsyncOpStatus_Complete) {
@@ -367,20 +366,20 @@ void IntegrationTestCommonBase::integrationTestMessageReceivedImpl([[maybe_unuse
 }
 
 void IntegrationTestCommonBase::integrationTestConnectCompleteImpl(
-    [[maybe_unused]] CC_Mqtt311AsyncOpStatus status, 
+    [[maybe_unused]] CC_Mqtt311AsyncOpStatus status,
     [[maybe_unused]] const CC_Mqtt311ConnectResponse* response)
 {
 }
 
 void IntegrationTestCommonBase::integrationTestSubscribeCompleteImpl(
     [[maybe_unused]] CC_Mqtt311SubscribeHandle handle,
-    [[maybe_unused]] CC_Mqtt311AsyncOpStatus status, 
+    [[maybe_unused]] CC_Mqtt311AsyncOpStatus status,
     [[maybe_unused]] const CC_Mqtt311SubscribeResponse* response)
 {
 }
 
 void IntegrationTestCommonBase::integrationTestPublishCompleteImpl(
-    [[maybe_unused]] CC_Mqtt311PublishHandle handle, 
+    [[maybe_unused]] CC_Mqtt311PublishHandle handle,
     [[maybe_unused]] CC_Mqtt311AsyncOpStatus status)
 {
 }

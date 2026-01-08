@@ -94,7 +94,7 @@ void UnitTestReceive::test2()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);
     auto* pubackMsg = dynamic_cast<UnitTestPubackMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubackMsg, nullptr);
     TS_ASSERT_EQUALS(pubackMsg->field_packetId().value(), PacketId);
@@ -139,11 +139,11 @@ void UnitTestReceive::test3()
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
     TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_ExactlyOnceDelivery);
     TS_ASSERT_EQUALS(msgInfo.m_retained, Retain);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -155,7 +155,7 @@ void UnitTestReceive::test3()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -194,7 +194,7 @@ void UnitTestReceive::test4()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -243,7 +243,7 @@ void UnitTestReceive::test5()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -292,7 +292,7 @@ void UnitTestReceive::test6()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
 
@@ -310,17 +310,16 @@ void UnitTestReceive::test6()
     connectRespConfig.m_sessionPresent = true;
     unitTestPerformConnect(client, &connectConfig, nullptr, &connectRespConfig);
 
-    // Sending PUBREL 
+    // Sending PUBREL
     UnitTestPubrelMsg pubrelMsg;
     pubrelMsg.field_packetId().setValue(PacketId);
     unitTestReceiveMessage(client, pubrelMsg);
 
     sentMsg = unitTestGetSentMessage();
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
 }
-
 
 void UnitTestReceive::test7()
 {
@@ -351,11 +350,11 @@ void UnitTestReceive::test7()
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
     TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_ExactlyOnceDelivery);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -381,14 +380,13 @@ void UnitTestReceive::test7()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
 
     TS_ASSERT(!unitTestHasMessageRecieved());
 }
-
 
 void UnitTestReceive::test8()
 {
@@ -420,11 +418,11 @@ void UnitTestReceive::test8()
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
     TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_ExactlyOnceDelivery);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -437,7 +435,7 @@ void UnitTestReceive::test8()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -465,13 +463,13 @@ void UnitTestReceive::test9()
     publishMsg.field_topic().value() = Topic;
     publishMsg.field_payload().value() = Data;
     publishMsg.doRefresh();
-    unitTestReceiveMessage(client, publishMsg);    
+    unitTestReceiveMessage(client, publishMsg);
     TS_ASSERT(!unitTestHasMessageRecieved()); // ignored
     TS_ASSERT(!unitTestHasSentMessage());
 
     publishMsg.transportField_flags().field_qos().value() = UnitTestPublishMsg::TransportField_flags::Field_qos::ValueType::AtLeastOnceDelivery;
     publishMsg.doRefresh();
-    unitTestReceiveMessage(client, publishMsg);    
+    unitTestReceiveMessage(client, publishMsg);
     TS_ASSERT(!unitTestHasMessageRecieved()); // ignored
 }
 
@@ -499,15 +497,15 @@ void UnitTestReceive::test10()
     publishMsg.field_payload().value() = Data;
 
     publishMsg.doRefresh();
-    unitTestReceiveMessage(client, publishMsg);   
+    unitTestReceiveMessage(client, publishMsg);
 
     TS_ASSERT(unitTestHasMessageRecieved());
-    unitTestPopReceivedMessageInfo();      
+    unitTestPopReceivedMessageInfo();
 
     TS_ASSERT(!unitTestHasMessageRecieved());
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -515,10 +513,10 @@ void UnitTestReceive::test10()
     UnitTestPubrelMsg pubrelMsg;
     pubrelMsg.transportField_flags().field_qos().value() = UnitTestPublishMsg::TransportField_flags::Field_qos::ValueType::ExactlyOnceDelivery;
     pubrelMsg.field_packetId().setValue(PacketId);
-    unitTestReceiveMessage(client, pubrelMsg);    
+    unitTestReceiveMessage(client, pubrelMsg);
 
     TS_ASSERT(!unitTestHasMessageRecieved());
-    TS_ASSERT(unitTestHasDisconnectInfo());      
+    TS_ASSERT(unitTestHasDisconnectInfo());
     auto& disconnectInfo = unitTestDisconnectInfo();
     TS_ASSERT_EQUALS(disconnectInfo.m_reason, CC_Mqtt311BrokerDisconnectReason_ProtocolError)       ;
 }
@@ -553,11 +551,11 @@ void UnitTestReceive::test11()
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
-    unitTestPopReceivedMessageInfo();  
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -570,7 +568,7 @@ void UnitTestReceive::test11()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -602,36 +600,36 @@ void UnitTestReceive::test12()
     publishMsg.field_payload().value() = Data;
 
     publishMsg.doRefresh();
-    unitTestReceiveMessage(client, publishMsg);  
+    unitTestReceiveMessage(client, publishMsg);
 
     TS_ASSERT(unitTestHasMessageRecieved());
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
     TS_ASSERT_EQUALS(msgInfo.m_qos, CC_Mqtt311QoS_AtLeastOnceDelivery);
-    unitTestPopReceivedMessageInfo();     
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);
     auto* pubackMsg = dynamic_cast<UnitTestPubackMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubackMsg, nullptr);
     TS_ASSERT_EQUALS(pubackMsg->field_packetId().value(), PacketId);
 
     // Assume PUBACK is not received by the broker
     publishMsg.transportField_flags().field_dup().setBitValue_bit(true);
-    unitTestReceiveMessage(client, publishMsg);  
+    unitTestReceiveMessage(client, publishMsg);
 
     TS_ASSERT(unitTestHasMessageRecieved());
     auto& msgInfo2 = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo2.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo2.m_data, Data);
     TS_ASSERT_EQUALS(msgInfo2.m_qos, CC_Mqtt311QoS_AtLeastOnceDelivery);
-    unitTestPopReceivedMessageInfo();        
+    unitTestPopReceivedMessageInfo();
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Puback);
     pubackMsg = dynamic_cast<UnitTestPubackMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubackMsg, nullptr);
     TS_ASSERT_EQUALS(pubackMsg->field_packetId().value(), PacketId);
@@ -666,11 +664,11 @@ void UnitTestReceive::test13()
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -682,7 +680,7 @@ void UnitTestReceive::test13()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -698,7 +696,7 @@ void UnitTestReceive::test13()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -708,7 +706,7 @@ void UnitTestReceive::test13()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -746,7 +744,7 @@ void UnitTestReceive::test14()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -775,10 +773,10 @@ void UnitTestReceive::test14()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
-    TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);    
+    TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
 
     UnitTestPubrelMsg pubrelMsg;
     pubrelMsg.field_packetId().setValue(PacketId);
@@ -786,7 +784,7 @@ void UnitTestReceive::test14()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -822,11 +820,11 @@ void UnitTestReceive::test15()
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -858,7 +856,7 @@ void UnitTestReceive::test15()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -894,11 +892,11 @@ void UnitTestReceive::test16()
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     auto* pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
     TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
@@ -906,7 +904,7 @@ void UnitTestReceive::test16()
     unitTestTick(client, 100);
     apiNotifyNetworkDisconnected(client);
     TS_ASSERT(!unitTestHasDisconnectInfo());
-    TS_ASSERT(unitTestCheckNoTicks()); 
+    TS_ASSERT(unitTestCheckNoTicks());
 
     unitTestClearState();
 
@@ -924,14 +922,14 @@ void UnitTestReceive::test16()
     auto& msgInfo2 = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo2.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo2.m_data, Data);
-    unitTestPopReceivedMessageInfo();     
+    unitTestPopReceivedMessageInfo();
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrec);
     pubrecMsg = dynamic_cast<UnitTestPubrecMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrecMsg, nullptr);
-    TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);    
+    TS_ASSERT_EQUALS(pubrecMsg->field_packetId().value(), PacketId);
 
     UnitTestPubrelMsg pubrelMsg;
     pubrelMsg.field_packetId().setValue(PacketId);
@@ -939,7 +937,7 @@ void UnitTestReceive::test16()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubcomp);
     auto* pubcompMsg = dynamic_cast<UnitTestPubcompMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubcompMsg, nullptr);
     TS_ASSERT_EQUALS(pubcompMsg->field_packetId().value(), PacketId);
@@ -960,7 +958,7 @@ void UnitTestReceive::test17()
 
     auto connectRespConfig = UnitTestConnectResponseConfig();
     connectRespConfig.m_sessionPresent = true;
-    unitTestPerformConnect(client, &connectConfig, nullptr, &connectRespConfig);        
+    unitTestPerformConnect(client, &connectConfig, nullptr, &connectRespConfig);
 
     const std::string Topic = "some/topic";
     const UnitTestData Data = {'h', 'e', 'l', 'l', 'o'};

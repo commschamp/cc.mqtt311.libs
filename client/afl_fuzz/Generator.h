@@ -31,7 +31,7 @@ class Generator
 public:
     using RawDataBuf = std::vector<std::uint8_t>;
 
-    using Mqtt311Message = 
+    using Mqtt311Message =
         cc_mqtt311::Message<
             comms::option::app::ReadIterator<const std::uint8_t*>,
             comms::option::app::WriteIterator<std::back_insert_iterator<RawDataBuf>>,

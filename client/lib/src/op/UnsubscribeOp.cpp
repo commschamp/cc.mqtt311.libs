@@ -16,7 +16,7 @@ namespace cc_mqtt311_client
 namespace op
 {
 
-namespace 
+namespace
 {
 
 inline UnsubscribeOp* asUnsubscribeOp(void* data)
@@ -24,14 +24,13 @@ inline UnsubscribeOp* asUnsubscribeOp(void* data)
     return reinterpret_cast<UnsubscribeOp*>(data);
 }
 
-} // namespace 
-    
+} // namespace
 
-UnsubscribeOp::UnsubscribeOp(ClientImpl& client) : 
+UnsubscribeOp::UnsubscribeOp(ClientImpl& client) :
     Base(client),
     m_timer(client.timerMgr().allocTimer())
 {
-}    
+}
 
 UnsubscribeOp::~UnsubscribeOp()
 {
@@ -48,12 +47,12 @@ CC_Mqtt311ErrorCode UnsubscribeOp::configTopic(const CC_Mqtt311UnsubscribeTopicC
     if (!verifySubFilter(config.m_topic)) {
         errorLog("Bad topic filter format in unsubscribe.");
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
     if constexpr (Config::HasSubTopicVerification) {
         if (client().configState().m_verifySubFilter) {
             auto& filtersMap = client().reuseState().m_subFilters;
-            auto iter = 
+            auto iter =
                 std::lower_bound(
                     filtersMap.begin(), filtersMap.end(), config.m_topic,
                     [](auto& storedTopic, const char* topicParam)
@@ -66,7 +65,7 @@ CC_Mqtt311ErrorCode UnsubscribeOp::configTopic(const CC_Mqtt311UnsubscribeTopicC
                 return CC_Mqtt311ErrorCode_BadParam;
             }
         }
-    }    
+    }
 
     auto& topicVec = m_unsubMsg.field_list().value();
     if (topicVec.max_size() <= topicVec.size()) {
@@ -82,16 +81,16 @@ CC_Mqtt311ErrorCode UnsubscribeOp::configTopic(const CC_Mqtt311UnsubscribeTopicC
         errorLog("Unsubscription topic value is too long");
         topicVec.pop_back();
         return CC_Mqtt311ErrorCode_BadParam;
-    }  
+    }
 
     return CC_Mqtt311ErrorCode_Success;
 }
 
-CC_Mqtt311ErrorCode UnsubscribeOp::send(CC_Mqtt311UnsubscribeCompleteCb cb, void* cbData) 
+CC_Mqtt311ErrorCode UnsubscribeOp::send(CC_Mqtt311UnsubscribeCompleteCb cb, void* cbData)
 {
     client().allowNextPrepare();
 
-    auto completeOnError = 
+    auto completeOnError =
         comms::util::makeScopeGuard(
             [this]()
             {
@@ -111,13 +110,13 @@ CC_Mqtt311ErrorCode UnsubscribeOp::send(CC_Mqtt311UnsubscribeCompleteCb cb, void
     if (!m_timer.isValid()) {
         errorLog("The library cannot allocate required number of timers.");
         return CC_Mqtt311ErrorCode_InternalError;
-    }    
+    }
 
     m_cb = cb;
     m_cbData = cbData;
 
     m_unsubMsg.field_packetId().setValue(allocPacketId());
-    auto result = client().sendMessage(m_unsubMsg); 
+    auto result = client().sendMessage(m_unsubMsg);
     if (result != CC_Mqtt311ErrorCode_Success) {
         return result;
     }
@@ -133,7 +132,7 @@ CC_Mqtt311ErrorCode UnsubscribeOp::cancel()
     if (m_cb == nullptr) {
         // hasn't been sent yet
         client().allowNextPrepare();
-    }            
+    }
 
     opComplete();
     return CC_Mqtt311ErrorCode_Success;
@@ -153,7 +152,7 @@ void UnsubscribeOp::handle(UnsubackMsg& msg)
             // Remove from the subscribed topics record regardless of the client().configState().m_verifySubFilter
             auto& topicStr = m_unsubMsg.field_list().value()[idx].value();
             auto& filtersMap = client().reuseState().m_subFilters;
-            auto iter = 
+            auto iter =
                 std::lower_bound(
                     filtersMap.begin(), filtersMap.end(), topicStr,
                     [](auto& storedTopic, auto& topicParam)
@@ -166,7 +165,7 @@ void UnsubscribeOp::handle(UnsubackMsg& msg)
             }
 
             filtersMap.erase(iter);
-        }  
+        }
     }
 
     completeOpInternal(CC_Mqtt311AsyncOpStatus_Complete);
@@ -189,7 +188,7 @@ void UnsubscribeOp::completeOpInternal(CC_Mqtt311AsyncOpStatus status)
     auto handle = toHandle();
     opComplete(); // mustn't access data members after destruction
     if (cb != nullptr) {
-        cb(cbData, handle, status);    
+        cb(cbData, handle, status);
     }
 }
 

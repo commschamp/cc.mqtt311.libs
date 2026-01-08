@@ -40,7 +40,7 @@ set (CC_MQTT311_CLIENT_ASYNC_SUBS_LIMIT 3)
 # Limit the amount of ongoing (unacknowledged) unsubscribe operations
 set (CC_MQTT311_CLIENT_ASYNC_UNSUBS_LIMIT 1)
 
-# Disable the error logging functionality 
+# Disable the error logging functionality
 set (CC_MQTT311_CLIENT_HAS_ERROR_LOG FALSE)
 
 # Disable the topic format verification functionality

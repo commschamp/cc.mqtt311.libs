@@ -19,7 +19,7 @@
 namespace cc_mqtt311_client_app
 {
 
-namespace 
+namespace
 {
 
 AppClient* asThis(void* data)
@@ -66,8 +66,8 @@ void printSubscribeReturnCode(CC_Mqtt311SubscribeReturnCode val)
     std::cout << "\tReturn Code: " << AppClient::toString(val) << '\n';
 }
 
-} // namespace 
-    
+} // namespace
+
 bool AppClient::start(int argc, const char* argv[])
 {
     if (!m_opts.parseArgs(argc, argv)) {
@@ -87,8 +87,7 @@ bool AppClient::start(int argc, const char* argv[])
     }
 
     return startImpl();
-}   
-
+}
 
 std::string AppClient::toString(CC_Mqtt311ErrorCode val)
 {
@@ -179,7 +178,7 @@ std::string AppClient::toString(CC_Mqtt311SubscribeReturnCode val)
     auto iter = Map.find(val);
     if (iter == Map.end()) {
         assert(false); // Should not happen
-        return std::to_string(val);        
+        return std::to_string(val);
     }
 
     return iter->second + " (" + std::to_string(val) + ')';
@@ -189,7 +188,7 @@ std::string AppClient::toString(const std::uint8_t* data, unsigned dataLen, bool
 {
     bool binary = forceBinary;
     if (!binary) {
-        binary = 
+        binary =
             std::any_of(
                 data, data + dataLen,
                 [](auto byte)
@@ -204,7 +203,7 @@ std::string AppClient::toString(const std::uint8_t* data, unsigned dataLen, bool
 
                     return false;
                 });
-    } 
+    }
 
     if (!binary) {
         return std::string(reinterpret_cast<const char*>(data), dataLen);
@@ -222,7 +221,7 @@ void AppClient::print(const CC_Mqtt311MessageInfo& info, bool printMessage)
 {
     std::cout << "[INFO]: Message Info:\n";
     if (printMessage) {
-        std::cout << 
+        std::cout <<
             "\tTopic: " << info.m_topic << '\n' <<
             "\tData: " << toString(info.m_data, info.m_dataLen, m_opts.subBinary()) << '\n';
     }
@@ -249,7 +248,7 @@ void AppClient::print(const CC_Mqtt311SubscribeResponse& response)
     std::cout << std::endl;
 }
 
-AppClient::AppClient(boost::asio::io_context& io, int& result) : 
+AppClient::AppClient(boost::asio::io_context& io, int& result) :
     m_io(io),
     m_result(result),
     m_timer(io),
@@ -270,7 +269,7 @@ bool AppClient::sendConnect(CC_Mqtt311ConnectHandle connect)
     if (ec != CC_Mqtt311ErrorCode_Success) {
         logError() << "Failed to send connect request with ec=" << toString(ec) << std::endl;
         return false;
-    }    
+    }
     return true;
 }
 
@@ -293,7 +292,7 @@ void AppClient::doComplete()
             logError() << "Failed to send disconnect with ec=" << toString(ec) << std::endl;
             doTerminate();
             return;
-        }       
+        }
     }
 
     boost::asio::post(
@@ -339,12 +338,12 @@ bool AppClient::startImpl()
     if (ec != CC_Mqtt311ErrorCode_Success) {
         logError() << "Failed to apply basic connect configuration with ec=" << toString(ec) << std::endl;
         return false;
-    }    
+    }
 
     auto willTopic = m_opts.willTopic();
     if (!willTopic.empty()) {
         auto willData = parseBinaryData(m_opts.willMessage());
-        
+
         auto willConfig = CC_Mqtt311ConnectWillConfig();
         ::cc_mqtt311_client_connect_init_config_will(&willConfig);
 
@@ -361,7 +360,7 @@ bool AppClient::startImpl()
         if (ec != CC_Mqtt311ErrorCode_Success) {
             logError() << "Failed to apply will configuration with ec=" << toString(ec) << std::endl;
             return false;
-        }      
+        }
     }
 
     return sendConnect(connect);
@@ -394,7 +393,7 @@ void AppClient::connectCompleteImpl(CC_Mqtt311AsyncOpStatus status, const CC_Mqt
         if (m_opts.verbose()) {
             print(*response);
         }
-        
+
         if (CC_Mqtt311ConnectReturnCode_Accepted < response->m_returnCode) {
             logError() << "Connection attempt was rejected" << std::endl;
             break;
@@ -414,7 +413,7 @@ std::vector<std::uint8_t> AppClient::parseBinaryData(const std::string& val)
     auto pos = 0U;
     while (pos < val.size()) {
         auto ch = val[pos];
-        auto addChar = 
+        auto addChar =
             [&result, &pos, ch]()
             {
                 result.push_back(static_cast<std::uint8_t>(ch));

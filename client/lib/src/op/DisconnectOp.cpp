@@ -16,10 +16,10 @@ namespace cc_mqtt311_client
 namespace op
 {
 
-DisconnectOp::DisconnectOp(ClientImpl& client) : 
+DisconnectOp::DisconnectOp(ClientImpl& client) :
     Base(client)
 {
-}    
+}
 
 CC_Mqtt311ErrorCode DisconnectOp::send()
 {
@@ -44,7 +44,6 @@ Op::Type DisconnectOp::typeImpl() const
 {
     return Type_Disconnect;
 }
-
 
 } // namespace op
 

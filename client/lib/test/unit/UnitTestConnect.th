@@ -36,7 +36,7 @@ private:
 void UnitTestConnect::test1()
 {
     // Simple connect and ack
-    
+
     auto clientPtr = apiAllocClient();
     auto* client = clientPtr.get();
     TS_ASSERT_DIFFERS(client, nullptr);
@@ -139,7 +139,7 @@ void UnitTestConnect::test2()
     connectWillConfig.m_data = &WillData[0];
     connectWillConfig.m_dataLen = static_cast<decltype(connectWillConfig.m_dataLen)>(WillData.size());
     connectWillConfig.m_qos = WillQos;
-    connectWillConfig.m_retain = WillRetain;    
+    connectWillConfig.m_retain = WillRetain;
 
     ec = apiConnectConfigWill(connect, &connectWillConfig);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
@@ -271,17 +271,17 @@ void UnitTestConnect::test4()
     TS_ASSERT_EQUALS(disconnect, nullptr);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
-    auto* subscribe = apiSubscribePrepare(client, &ec);    
+    auto* subscribe = apiSubscribePrepare(client, &ec);
     TS_ASSERT_EQUALS(subscribe, nullptr);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
-    auto* unsubscribe = apiUnsubscribePrepare(client, &ec);    
+    auto* unsubscribe = apiUnsubscribePrepare(client, &ec);
     TS_ASSERT_EQUALS(unsubscribe, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
-    auto* publish = apiPublishPrepare(client, &ec);    
+    auto* publish = apiPublishPrepare(client, &ec);
     TS_ASSERT_EQUALS(publish, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);        
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 }
 
 void UnitTestConnect::test5()
@@ -299,7 +299,7 @@ void UnitTestConnect::test5()
     auto ec = CC_Mqtt311ErrorCode_ValuesLimit;
     auto* connect = apiConnectPrepare(client, &ec);
     TS_ASSERT_EQUALS(connect, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_AlreadyConnected);        
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_AlreadyConnected);
 }
 
 void UnitTestConnect::test6()
@@ -312,7 +312,7 @@ void UnitTestConnect::test6()
 
     auto* connect = apiConnectPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(connect, nullptr);
-    
+
     auto config = CC_Mqtt311ConnectConfig();
     apiConnectInitConfig(&config);
 
@@ -332,7 +332,7 @@ void UnitTestConnect::test7()
 
     auto* connect = apiConnectPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(connect, nullptr);
-    
+
     auto config = CC_Mqtt311ConnectConfig();
     apiConnectInitConfig(&config);
 
@@ -364,7 +364,7 @@ void UnitTestConnect::test8()
 
     auto* connect = apiConnectPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(connect, nullptr);
-    
+
     auto config = CC_Mqtt311ConnectConfig();
     apiConnectInitConfig(&config);
 
@@ -472,7 +472,7 @@ void UnitTestConnect::test10()
     TS_ASSERT(!apiIsConnected(client));
 
     TS_ASSERT(unitTestCheckNoTicks());
-    apiNotifyNetworkDisconnected(client); 
+    apiNotifyNetworkDisconnected(client);
 }
 
 void UnitTestConnect::test11()
@@ -538,7 +538,7 @@ void UnitTestConnect::test12()
     auto& msgInfo = unitTestReceivedMessageInfo();
     TS_ASSERT_EQUALS(msgInfo.m_topic, Topic);
     TS_ASSERT_EQUALS(msgInfo.m_data, Data);
-    unitTestPopReceivedMessageInfo();    
+    unitTestPopReceivedMessageInfo();
 
     unitTestTick(client, 1000);
     unitTestPerformDisconnect(client);
@@ -589,17 +589,17 @@ void UnitTestConnect::test14()
 
     auto* tickReq = unitTestTickReq();
     TS_ASSERT_DIFFERS(tickReq, nullptr);
-    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultKeepAliveMs);    
+    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultKeepAliveMs);
 
     unitTestTick(client);
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
     TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pingreq);
-    TS_ASSERT(!unitTestHasDisconnectInfo()); 
+    TS_ASSERT(!unitTestHasDisconnectInfo());
 
     tickReq = unitTestTickReq();
     TS_ASSERT_DIFFERS(tickReq, nullptr);
-    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultOpTimeoutMs);    
+    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultOpTimeoutMs);
 
     const unsigned PingDelay = 1;
     unitTestTick(client, PingDelay);
@@ -608,24 +608,24 @@ void UnitTestConnect::test14()
 
     tickReq = unitTestTickReq();
     auto nextTickMs = UnitTestDefaultKeepAliveMs - PingDelay;
-    TS_ASSERT_EQUALS(tickReq->m_requested, nextTickMs);   
+    TS_ASSERT_EQUALS(tickReq->m_requested, nextTickMs);
 
     unitTestTick(client);
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
     TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pingreq);
-    TS_ASSERT(!unitTestHasDisconnectInfo());  
+    TS_ASSERT(!unitTestHasDisconnectInfo());
 
     tickReq = unitTestTickReq();
     TS_ASSERT_DIFFERS(tickReq, nullptr);
-    TS_ASSERT_EQUALS(tickReq->m_requested, PingDelay);   
+    TS_ASSERT_EQUALS(tickReq->m_requested, PingDelay);
 
     unitTestTick(client, PingDelay);
     TS_ASSERT(!unitTestHasSentMessage());
-    unitTestReceiveMessage(client, pingrespMsg);     
+    unitTestReceiveMessage(client, pingrespMsg);
     tickReq = unitTestTickReq();
     TS_ASSERT_DIFFERS(tickReq, nullptr);
-    TS_ASSERT_EQUALS(tickReq->m_requested, nextTickMs);    
+    TS_ASSERT_EQUALS(tickReq->m_requested, nextTickMs);
 
     unitTestTick(client, 6000);
     unitTestPerformDisconnect(client);
@@ -636,5 +636,5 @@ void UnitTestConnect::test14()
 
     tickReq = unitTestTickReq();
     TS_ASSERT_DIFFERS(tickReq, nullptr);
-    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultKeepAliveMs);    
+    TS_ASSERT_EQUALS(tickReq->m_requested, UnitTestDefaultKeepAliveMs);
 }

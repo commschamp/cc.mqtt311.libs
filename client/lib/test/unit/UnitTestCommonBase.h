@@ -42,13 +42,13 @@ public:
         void (*m_connect_init_config_will)(CC_Mqtt311ConnectWillConfig*) = nullptr;
         CC_Mqtt311ErrorCode (*m_connect_set_response_timeout)(CC_Mqtt311ConnectHandle, unsigned) = nullptr;
         unsigned (*m_connect_get_response_timeout)(CC_Mqtt311ConnectHandle) = nullptr;
-        CC_Mqtt311ErrorCode (*m_connect_config)(CC_Mqtt311ConnectHandle, const CC_Mqtt311ConnectConfig*) = nullptr;        
+        CC_Mqtt311ErrorCode (*m_connect_config)(CC_Mqtt311ConnectHandle, const CC_Mqtt311ConnectConfig*) = nullptr;
         CC_Mqtt311ErrorCode (*m_connect_config_will)(CC_Mqtt311ConnectHandle, const CC_Mqtt311ConnectWillConfig*) = nullptr;
         CC_Mqtt311ErrorCode (*m_connect_send)(CC_Mqtt311ConnectHandle, CC_Mqtt311ConnectCompleteCb, void*) = nullptr;
         CC_Mqtt311ErrorCode (*m_connect_cancel)(CC_Mqtt311ConnectHandle) = nullptr;
         CC_Mqtt311ErrorCode (*m_connect)(CC_Mqtt311ClientHandle handle, const CC_Mqtt311ConnectConfig*, const CC_Mqtt311ConnectWillConfig*, CC_Mqtt311ConnectCompleteCb, void*) = nullptr;
         bool (*m_is_connected)(CC_Mqtt311ClientHandle) = nullptr;
-        CC_Mqtt311DisconnectHandle (*m_disconnect_prepare)(CC_Mqtt311ClientHandle, CC_Mqtt311ErrorCode*) = nullptr; 
+        CC_Mqtt311DisconnectHandle (*m_disconnect_prepare)(CC_Mqtt311ClientHandle, CC_Mqtt311ErrorCode*) = nullptr;
         CC_Mqtt311ErrorCode (*m_disconnect_send)(CC_Mqtt311DisconnectHandle) = nullptr;
         CC_Mqtt311ErrorCode (*m_disconnect_cancel)(CC_Mqtt311DisconnectHandle) = nullptr;
         CC_Mqtt311ErrorCode (*m_disconnect)(CC_Mqtt311ClientHandle) = nullptr;
@@ -83,17 +83,17 @@ public:
         CC_Mqtt311ErrorCode (*m_publish_set_ordering)(CC_Mqtt311ClientHandle, CC_Mqtt311PublishOrdering) = nullptr;
         CC_Mqtt311PublishOrdering (*m_publish_get_ordering)(CC_Mqtt311ClientHandle) = nullptr;
         void (*m_set_next_tick_program_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311NextTickProgramCb, void*) = nullptr;
-        void (*m_set_cancel_next_tick_wait_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311CancelNextTickWaitCb, void*) = nullptr;        
+        void (*m_set_cancel_next_tick_wait_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311CancelNextTickWaitCb, void*) = nullptr;
         void (*m_set_send_output_data_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311SendOutputDataCb, void*) = nullptr;
-        void (*m_set_broker_disconnect_report_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311BrokerDisconnectReportCb, void*) = nullptr;        
-        void (*m_set_message_received_report_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311MessageReceivedReportCb, void*) = nullptr;        
-        void (*m_set_error_log_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311ErrorLogCb, void*) = nullptr;        
+        void (*m_set_broker_disconnect_report_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311BrokerDisconnectReportCb, void*) = nullptr;
+        void (*m_set_message_received_report_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311MessageReceivedReportCb, void*) = nullptr;
+        void (*m_set_error_log_callback)(CC_Mqtt311ClientHandle, CC_Mqtt311ErrorLogCb, void*) = nullptr;
     };
 
     struct UnitTestDeleter
     {
         UnitTestDeleter() = default;
-        explicit UnitTestDeleter(const LibFuncs& ops) : 
+        explicit UnitTestDeleter(const LibFuncs& ops) :
             m_free(ops.m_free)
         {
         }
@@ -105,10 +105,9 @@ public:
 
     private:
         void (*m_free)(CC_Mqtt311ClientHandle) = nullptr;
-    }; 
+    };
 
     using UnitTestClientPtr = std::unique_ptr<CC_Mqtt311Client, UnitTestDeleter>;
-
 
 protected:
 
@@ -116,7 +115,6 @@ protected:
 
     static constexpr unsigned UnitTestDefaultOpTimeoutMs = 2000;
     static constexpr unsigned UnitTestDefaultKeepAliveMs = 60000;
-
 
     struct UnitTestConnectResponse
     {
@@ -151,19 +149,19 @@ protected:
     {
         CC_Mqtt311AsyncOpStatus m_status = CC_Mqtt311AsyncOpStatus_ValuesLimit;
         UnitTestSubscribeResponse m_response;
-    };  
+    };
 
     struct UnitTestUnsubscribeResponseInfo
     {
         CC_Mqtt311AsyncOpStatus m_status = CC_Mqtt311AsyncOpStatus_ValuesLimit;
-    };          
+    };
 
     struct UnitTestMessageInfo
     {
         std::string m_topic;
         UnitTestData m_data;
         CC_Mqtt311QoS m_qos = CC_Mqtt311QoS_ValuesLimit;
-        bool m_retained = false;     
+        bool m_retained = false;
 
         UnitTestMessageInfo() = default;
         UnitTestMessageInfo(const UnitTestMessageInfo&) = default;
@@ -174,13 +172,13 @@ protected:
         }
 
         UnitTestMessageInfo& operator=(const UnitTestMessageInfo&) = default;
-        UnitTestMessageInfo& operator=(const CC_Mqtt311MessageInfo& other);        
-    };    
+        UnitTestMessageInfo& operator=(const CC_Mqtt311MessageInfo& other);
+    };
 
     struct UnitTestPublishResponseInfo
     {
         CC_Mqtt311AsyncOpStatus m_status = CC_Mqtt311AsyncOpStatus_ValuesLimit;
-    };         
+    };
 
     struct UnitTestDisconnectInfo
     {
@@ -191,7 +189,7 @@ protected:
     {
         unsigned m_requested = 0U;
         unsigned m_elapsed = 0U;
-    };    
+    };
 
     struct UnitTestConnectResponseConfig
     {
@@ -235,23 +233,23 @@ protected:
     void unitTestPopDisconnectInfo();
     bool unitTestHasMessageRecieved();
     const UnitTestMessageInfo& unitTestReceivedMessageInfo();
-    void unitTestPopReceivedMessageInfo();      
+    void unitTestPopReceivedMessageInfo();
     void unitTestPerformConnect(
-        CC_Mqtt311Client* client, 
+        CC_Mqtt311Client* client,
         const CC_Mqtt311ConnectConfig* config,
         const CC_Mqtt311ConnectWillConfig* willConfig = nullptr,
         const UnitTestConnectResponseConfig* responseConfig = nullptr);
 
     void unitTestPerformBasicConnect(
-        CC_Mqtt311Client* client, 
-        const char* clientId, 
+        CC_Mqtt311Client* client,
+        const char* clientId,
         bool cleanSession = true);
 
     void unitTestPerformDisconnect(CC_Mqtt311Client* client);
 
     void unitTestPerformSubscribe(
-        CC_Mqtt311Client* client, 
-        CC_Mqtt311SubscribeTopicConfig* topicConfigs, 
+        CC_Mqtt311Client* client,
+        CC_Mqtt311SubscribeTopicConfig* topicConfigs,
         unsigned topicConfigsCount = 1U);
     void unitTestPerformBasicSubscribe(CC_Mqtt311Client* client, const char* topic);
 
@@ -290,11 +288,11 @@ protected:
     bool apiPublishWasInitiated(CC_Mqtt311PublishHandle handle);
     CC_Mqtt311ErrorCode apiPublishSetOrdering(CC_Mqtt311ClientHandle handle, CC_Mqtt311PublishOrdering ordering);
     CC_Mqtt311PublishOrdering apiPublishGetOrdering(CC_Mqtt311ClientHandle handle);
-    void apiSetNextTickProgramCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311NextTickProgramCb cb, void* data);    
-    void apiSetCancelNextTickWaitCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311CancelNextTickWaitCb cb, void* data);    
-    void apiSetSendOutputDataCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311SendOutputDataCb cb, void* data);    
-    void apiSetBrokerDisconnectReportCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311BrokerDisconnectReportCb cb, void* data);    
-    void apiSetMessageReceivedReportCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311MessageReceivedReportCb cb, void* data);    
+    void apiSetNextTickProgramCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311NextTickProgramCb cb, void* data);
+    void apiSetCancelNextTickWaitCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311CancelNextTickWaitCb cb, void* data);
+    void apiSetSendOutputDataCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311SendOutputDataCb cb, void* data);
+    void apiSetBrokerDisconnectReportCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311BrokerDisconnectReportCb cb, void* data);
+    void apiSetMessageReceivedReportCb(CC_Mqtt311ClientHandle handle, CC_Mqtt311MessageReceivedReportCb cb, void* data);
 
 private:
 
@@ -309,7 +307,7 @@ private:
     static void unitTestUnsubscribeCompleteCb(void* obj, CC_Mqtt311UnsubscribeHandle handle, CC_Mqtt311AsyncOpStatus status);
     static void unitTestPublishCompleteCb(void* obj, CC_Mqtt311PublishHandle handle, CC_Mqtt311AsyncOpStatus status);
 
-    LibFuncs m_funcs;  
+    LibFuncs m_funcs;
     std::vector<TickInfo> m_tickReq;
     std::vector<std::uint8_t> m_sentData;
     std::vector<std::uint8_t> m_receivedData;

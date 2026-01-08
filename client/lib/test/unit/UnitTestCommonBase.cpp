@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 
-namespace 
+namespace
 {
 
 #define test_assert(cond_) \
@@ -12,7 +12,6 @@ namespace
         std::cerr << "\nAssertion failure (" << #cond_ << ") in " << __FILE__ << ":" << __LINE__ << std::endl; \
         std::exit(1); \
     }
-
 
 void assignStringInternal(std::string& dest, const char* source)
 {
@@ -32,7 +31,7 @@ void assignDataInternal(TDest& dest, TSrc* source, unsigned count)
     }
 }
 
-} // namespace 
+} // namespace
 
 UnitTestCommonBase::UnitTestCommonBase(const LibFuncs& funcs) :
     m_funcs(funcs)
@@ -80,35 +79,34 @@ UnitTestCommonBase::UnitTestCommonBase(const LibFuncs& funcs) :
     test_assert(m_funcs.m_unsubscribe_init_config_topic != nullptr);
     test_assert(m_funcs.m_unsubscribe_config_topic != nullptr);
     test_assert(m_funcs.m_unsubscribe_send != nullptr);
-    test_assert(m_funcs.m_unsubscribe_cancel != nullptr);    
-    test_assert(m_funcs.m_unsubscribe != nullptr);    
-    test_assert(m_funcs.m_publish_prepare != nullptr);    
-    test_assert(m_funcs.m_publish_count != nullptr);    
-    test_assert(m_funcs.m_publish_init_config != nullptr);    
-    test_assert(m_funcs.m_publish_set_response_timeout != nullptr);    
-    test_assert(m_funcs.m_publish_get_response_timeout != nullptr);    
-    test_assert(m_funcs.m_publish_set_resend_attempts != nullptr);    
-    test_assert(m_funcs.m_publish_get_resend_attempts != nullptr);      
-    test_assert(m_funcs.m_publish_config != nullptr);      
-    test_assert(m_funcs.m_publish_send != nullptr);  
-    test_assert(m_funcs.m_publish_cancel != nullptr);  
-    test_assert(m_funcs.m_publish_was_initiated != nullptr);  
-    test_assert(m_funcs.m_publish != nullptr);  
-    test_assert(m_funcs.m_publish_set_ordering != nullptr);  
-    test_assert(m_funcs.m_publish_get_ordering != nullptr);  
-    test_assert(m_funcs.m_set_next_tick_program_callback != nullptr); 
-    test_assert(m_funcs.m_set_cancel_next_tick_wait_callback != nullptr); 
-    test_assert(m_funcs.m_set_send_output_data_callback != nullptr); 
-    test_assert(m_funcs.m_set_broker_disconnect_report_callback != nullptr); 
-    test_assert(m_funcs.m_set_message_received_report_callback != nullptr); 
-    test_assert(m_funcs.m_set_error_log_callback != nullptr); 
+    test_assert(m_funcs.m_unsubscribe_cancel != nullptr);
+    test_assert(m_funcs.m_unsubscribe != nullptr);
+    test_assert(m_funcs.m_publish_prepare != nullptr);
+    test_assert(m_funcs.m_publish_count != nullptr);
+    test_assert(m_funcs.m_publish_init_config != nullptr);
+    test_assert(m_funcs.m_publish_set_response_timeout != nullptr);
+    test_assert(m_funcs.m_publish_get_response_timeout != nullptr);
+    test_assert(m_funcs.m_publish_set_resend_attempts != nullptr);
+    test_assert(m_funcs.m_publish_get_resend_attempts != nullptr);
+    test_assert(m_funcs.m_publish_config != nullptr);
+    test_assert(m_funcs.m_publish_send != nullptr);
+    test_assert(m_funcs.m_publish_cancel != nullptr);
+    test_assert(m_funcs.m_publish_was_initiated != nullptr);
+    test_assert(m_funcs.m_publish != nullptr);
+    test_assert(m_funcs.m_publish_set_ordering != nullptr);
+    test_assert(m_funcs.m_publish_get_ordering != nullptr);
+    test_assert(m_funcs.m_set_next_tick_program_callback != nullptr);
+    test_assert(m_funcs.m_set_cancel_next_tick_wait_callback != nullptr);
+    test_assert(m_funcs.m_set_send_output_data_callback != nullptr);
+    test_assert(m_funcs.m_set_broker_disconnect_report_callback != nullptr);
+    test_assert(m_funcs.m_set_message_received_report_callback != nullptr);
+    test_assert(m_funcs.m_set_error_log_callback != nullptr);
 }
-
 
 UnitTestCommonBase::UnitTestConnectResponse& UnitTestCommonBase::UnitTestConnectResponse::operator=(const CC_Mqtt311ConnectResponse& response)
 {
     auto thisTie = std::tie(m_returnCode, m_sessionPresent);
-    auto responseTie = std::forward_as_tuple(response.m_returnCode, response.m_sessionPresent);            
+    auto responseTie = std::forward_as_tuple(response.m_returnCode, response.m_sessionPresent);
     thisTie = responseTie;
     return *this;
 }
@@ -118,7 +116,6 @@ UnitTestCommonBase::UnitTestSubscribeResponse& UnitTestCommonBase::UnitTestSubsc
     assignDataInternal(m_returnCodes, response.m_returnCodes, response.m_returnCodesCount);
     return *this;
 }
-
 
 UnitTestCommonBase::UnitTestMessageInfo& UnitTestCommonBase::UnitTestMessageInfo::operator=(const CC_Mqtt311MessageInfo& other)
 {
@@ -219,7 +216,7 @@ UniTestsMsgPtr UnitTestCommonBase::unitTestGetSentMessage()
 {
     UniTestsMsgPtr msg;
     UnitTestsFrame frame;
-    
+
     test_assert(!m_sentData.empty());
     UnitTestMessage::ReadIterator begIter = &m_sentData[0];
     auto readIter = begIter;
@@ -357,7 +354,7 @@ void UnitTestCommonBase::unitTestPopReceivedMessageInfo()
 }
 
 void UnitTestCommonBase::unitTestPerformConnect(
-    CC_Mqtt311Client* client, 
+    CC_Mqtt311Client* client,
     const CC_Mqtt311ConnectConfig* config,
     const CC_Mqtt311ConnectWillConfig* willConfig,
     const UnitTestConnectResponseConfig* responseConfig)
@@ -368,10 +365,10 @@ void UnitTestCommonBase::unitTestPerformConnect(
     auto sentMsg = unitTestGetSentMessage();
     test_assert(static_cast<bool>(sentMsg));
     test_assert(sentMsg->getId() == cc_mqtt311::MsgId_Connect);
-    test_assert(!unitTestIsConnectComplete());    
+    test_assert(!unitTestIsConnectComplete());
 
     auto* tickReq = unitTestTickReq();
-    test_assert(tickReq->m_requested <= UnitTestDefaultOpTimeoutMs);    
+    test_assert(tickReq->m_requested <= UnitTestDefaultOpTimeoutMs);
 
     unitTestTick(client, 1000);
     UnitTestConnackMsg connackMsg;
@@ -380,10 +377,10 @@ void UnitTestCommonBase::unitTestPerformConnect(
     if (responseConfig != nullptr) {
         connackMsg.field_returnCode().setValue(responseConfig->m_returnCode);
         connackMsg.field_flags().setBitValue_sp(responseConfig->m_sessionPresent);
-    } 
+    }
 
     unitTestReceiveMessage(client, connackMsg);
-    test_assert(unitTestIsConnectComplete());   
+    test_assert(unitTestIsConnectComplete());
 
     auto& connectInfo = unitTestConnectResponseInfo();
     test_assert(connectInfo.m_status == CC_Mqtt311AsyncOpStatus_Complete);
@@ -393,12 +390,12 @@ void UnitTestCommonBase::unitTestPerformConnect(
         test_assert(connectInfo.m_response.m_returnCode == responseConfig->m_returnCode);
         test_assert(connectInfo.m_response.m_sessionPresent == responseConfig->m_sessionPresent);
     }
-    unitTestPopConnectResponseInfo();    
+    unitTestPopConnectResponseInfo();
 }
 
 void UnitTestCommonBase::unitTestPerformBasicConnect(
-    CC_Mqtt311Client* client, 
-    const char* clientId, 
+    CC_Mqtt311Client* client,
+    const char* clientId,
     bool cleanSession)
 {
     auto config = CC_Mqtt311ConnectConfig();
@@ -417,8 +414,8 @@ void UnitTestCommonBase::unitTestPerformDisconnect(CC_Mqtt311Client* client)
 }
 
 void UnitTestCommonBase::unitTestPerformSubscribe(
-    CC_Mqtt311Client* client, 
-    CC_Mqtt311SubscribeTopicConfig* topicConfigs, 
+    CC_Mqtt311Client* client,
+    CC_Mqtt311SubscribeTopicConfig* topicConfigs,
     unsigned topicConfigsCount)
 {
     auto ec = m_funcs.m_subscribe(client, topicConfigs, topicConfigsCount, &UnitTestCommonBase::unitTestSubscribeCompleteCb, this);
@@ -427,7 +424,7 @@ void UnitTestCommonBase::unitTestPerformSubscribe(
 
     auto sentMsg = unitTestGetSentMessage();
     test_assert(static_cast<bool>(sentMsg));
-    test_assert(sentMsg->getId() == cc_mqtt311::MsgId_Subscribe);    
+    test_assert(sentMsg->getId() == cc_mqtt311::MsgId_Subscribe);
     [[maybe_unused]] auto* subscribeMsg = dynamic_cast<UnitTestSubscribeMsg*>(sentMsg.get());
     test_assert(subscribeMsg != nullptr);
 
@@ -440,12 +437,12 @@ void UnitTestCommonBase::unitTestPerformSubscribe(
     }
 
     unitTestReceiveMessage(client, subackMsg);
-    test_assert(unitTestIsSubscribeComplete());    
+    test_assert(unitTestIsSubscribeComplete());
 
     [[maybe_unused]] auto& subackInfo = unitTestSubscribeResponseInfo();
     test_assert(subackInfo.m_status == CC_Mqtt311AsyncOpStatus_Complete);
     test_assert(subackInfo.m_response.m_returnCodes.size() == topicConfigsCount);
-    unitTestPopSubscribeResponseInfo();    
+    unitTestPopSubscribeResponseInfo();
 }
 
 void UnitTestCommonBase::unitTestPerformBasicSubscribe(CC_Mqtt311Client* client, const char* topic)
@@ -462,7 +459,7 @@ void UnitTestCommonBase::unitTestVerifyDisconnectSent()
     test_assert(unitTestHasSentMessage());
     auto sentMsg = unitTestGetSentMessage();
     test_assert(static_cast<bool>(sentMsg));
-    test_assert(sentMsg->getId() == cc_mqtt311::MsgId_Disconnect);    
+    test_assert(sentMsg->getId() == cc_mqtt311::MsgId_Disconnect);
     auto* disconnectMsg = dynamic_cast<UnitTestDisconnectMsg*>(sentMsg.get());
     test_assert(disconnectMsg != nullptr);
 }

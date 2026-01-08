@@ -23,35 +23,35 @@ ProgramOptions::ProgramOptions()
         ("verbose,v", "Verbose output")
         ("log-file,f", po::value<std::string>(), "Output log file")
         ("gen-input,g", po::value<std::string>()->default_value(std::string()), "Generate fuzz input file")
-    ;  
+    ;
 
     po::options_description connectOpts("Connect Options");
     connectOpts.add_options()
         ("client-id,i", po::value<std::string>()->default_value("afl_client"), "Client ID")
-    ;  
+    ;
 
     po::options_description subOpts("Subscribe Options");
     subOpts.add_options()
         ("sub-topic,t", po::value<StringsList>(), "Subscribe topic filters. Can be used multiple times. "
             "Multiple topics can also be comma separated in single occurrance, to be packed into single subscribe message. "
             "If not specified, single subscribe to \"#\" is assumed")
-    ;    
+    ;
 
     po::options_description pubOpts("Publish Options");
     subOpts.add_options()
-        ("min-pub-count", po::value<unsigned>()->default_value(3U), 
+        ("min-pub-count", po::value<unsigned>()->default_value(3U),
             "Number of successful publish counts before unsubscribing to previously subscribed topics")
-    ;            
+    ;
 
     m_desc.add(commonOpts);
-    m_desc.add(connectOpts);  
+    m_desc.add(connectOpts);
     m_desc.add(subOpts);
 }
 
 bool ProgramOptions::parseArgs(int argc, const char* argv[])
 {
     po::store(po::parse_command_line(argc, argv, m_desc), m_vm);
-    po::notify(m_vm);  
+    po::notify(m_vm);
 
     return true;
 }
@@ -97,11 +97,11 @@ std::vector<ProgramOptions::StringsList> ProgramOptions::subTopics() const
     if (values.empty()) {
         values.push_back("#");
     }
-    
+
     std::vector<StringsList> result;
     result.reserve(values.size());
     std::transform(
-        values.begin(), values.end(), std::back_inserter(result), 
+        values.begin(), values.end(), std::back_inserter(result),
         [](auto& str)
         {
             StringsList topics;
@@ -135,7 +135,7 @@ ProgramOptions::StringsList ProgramOptions::stringListOpts(const std::string& na
         result = m_vm[name].as<StringsList>();
     }
 
-    return result;    
+    return result;
 }
 
 } // namespace cc_mqtt311_client_afl_fuzz

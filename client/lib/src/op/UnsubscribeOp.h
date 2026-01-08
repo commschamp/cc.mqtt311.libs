@@ -36,18 +36,18 @@ public:
     static CC_Mqtt311UnsubscribeHandle asHandle(UnsubscribeOp* obj)
     {
         return reinterpret_cast<CC_Mqtt311UnsubscribeHandle>(obj);
-    }    
+    }
 
     static UnsubscribeOp* fromHandle(CC_Mqtt311UnsubscribeHandle handle)
     {
         return reinterpret_cast<UnsubscribeOp*>(handle);
-    }    
+    }
 
     using Base::handle;
     virtual void handle(UnsubackMsg& msg) override;
 
 protected:
-    virtual Type typeImpl() const override;    
+    virtual Type typeImpl() const override;
     virtual void terminateOpImpl(CC_Mqtt311AsyncOpStatus status) override;
 
 private:
@@ -66,6 +66,5 @@ private:
 };
 
 } // namespace op
-
 
 } // namespace cc_mqtt311_client

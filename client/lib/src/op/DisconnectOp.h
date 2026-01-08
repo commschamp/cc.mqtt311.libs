@@ -26,13 +26,12 @@ public:
     CC_Mqtt311ErrorCode cancel();
 
 protected:
-    virtual Type typeImpl() const override;    
+    virtual Type typeImpl() const override;
 
 private:
     DisconnectMsg m_disconnectMsg;
 };
 
 } // namespace op
-
 
 } // namespace cc_mqtt311_client

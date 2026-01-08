@@ -27,18 +27,17 @@
 namespace cc_mqtt311_client_afl_fuzz
 {
 
-namespace 
+namespace
 {
 
 const std::size_t BufSize = 1024000;
 
-} // namespace 
-    
+} // namespace
 
 class AflFuzzImpl
 {
 public:
-    explicit AflFuzzImpl(const ProgramOptions& opts, Logger& logger) : 
+    explicit AflFuzzImpl(const ProgramOptions& opts, Logger& logger) :
         m_opts(opts),
         m_logger(logger),
         m_client(cc_mqtt311_##NAME##client_alloc()),
@@ -73,9 +72,9 @@ public:
 
     void run()
     {
-#ifndef WIN32        
+#ifndef WIN32
         sync();
-#endif        
+#endif
 
         std::uint8_t buf[BufSize] = {0};
         while (true) {
@@ -88,7 +87,7 @@ public:
 
             if (m_state.m_reinitRequired) {
                 doReinit();
-            }   
+            }
 
             do {
                 if (m_state.m_connectRequired) {
@@ -108,8 +107,7 @@ public:
                 doUnsubscribeIfNeeded();
                 doDisconnectIfNeeded();
 
-            } while (false);      
-        
+            } while (false);
 
             int len = 0;
             bool noMoreRead = true;
@@ -118,7 +116,7 @@ public:
                 len = _read(0, buf, BufSize);
 #else // #ifdef WIN32
                 len = static_cast<decltype(len)>(read(0, buf, BufSize));
-#endif // #ifdef WIN32                
+#endif // #ifdef WIN32
                 noMoreRead = (len <= 0);
                 len = std::max(len, static_cast<decltype(len)>(0));
                 infoLog() << "Read " << len << " bytes\n";
@@ -215,7 +213,7 @@ public:
             }
 
             m_inData.erase(m_inData.begin(), m_inData.begin() + consumed);
-            infoLog() << "Keeping " << m_inData.size() << " bytes for the next iteration\n";        
+            infoLog() << "Keeping " << m_inData.size() << " bytes for the next iteration\n";
         }
 
         m_client.reset();
@@ -230,7 +228,7 @@ private:
         {
             cc_mqtt311_##NAME##client_free(ptr);
         }
-    }; 
+    };
 
     using ClientPtr = std::unique_ptr<CC_Mqtt311Client, ClientDeleter>;
 
@@ -282,7 +280,7 @@ private:
     void doConnect()
     {
         m_state.m_connected = false;
-        
+
         infoLog() << "Connecting..." << std::endl;
         CC_Mqtt311ErrorCode ec = CC_Mqtt311ErrorCode_ValuesLimit;
         auto connect = cc_mqtt311_##NAME##client_connect_prepare(m_client.get(), &ec);
@@ -301,20 +299,20 @@ private:
         if (!clientId.empty()) {
             config.m_clientId = clientId.c_str();
         }
-        
+
         ec = cc_mqtt311_##NAME##client_connect_config(connect, &config);
         assert(ec == CC_Mqtt311ErrorCode_Success);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             errorLog() << "Unexpected failure in connect basic configuration\n";
             exit(-1);
-        }   
+        }
 
         ec = cc_mqtt311_##NAME##client_connect_send(connect, &AflFuzzImpl::connectCompleteCb, this);
         assert(ec == CC_Mqtt311ErrorCode_Success);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             errorLog() << "Unexpected failure in sending connect request\n";
             exit(-1);
-        }   
+        }
 
         m_state.m_connectRequired = false;
     }
@@ -330,12 +328,12 @@ private:
 
             CC_Mqtt311ErrorCode ec = CC_Mqtt311ErrorCode_ValuesLimit;
             subInfo.m_subHandle = cc_mqtt311_##NAME##client_subscribe_prepare(m_client.get(), &ec);
-            
+
             if (subInfo.m_subHandle == nullptr) {
                 errorLog() << "Unexpected failure in subscribe allocation\n";
                 subInfo.m_acked = true;
                 continue;
-            }     
+            }
 
             assert(ec == CC_Mqtt311ErrorCode_Success);
 
@@ -353,7 +351,7 @@ private:
                     }
 
                     if (config.m_maxQos > CC_Mqtt311QoS_AtMostOnceDelivery) {
-                        config.m_maxQos = 
+                        config.m_maxQos =
                             static_cast<decltype(config.m_maxQos)>(
                                 static_cast<unsigned>(config.m_maxQos) - 1U);
                         continue;
@@ -377,7 +375,7 @@ private:
                 errorLog() << "Unexpected failure in sending subscribe request";
                 subInfo.m_subHandle = nullptr;
                 subInfo.m_acked = true;
-            }             
+            }
         }
     }
 
@@ -387,7 +385,7 @@ private:
             return;
         }
 
-        bool subsComplete = 
+        bool subsComplete =
             std::all_of(
                 m_state.m_subs.begin(), m_state.m_subs.end(),
                 [](auto& subInfo)
@@ -413,7 +411,7 @@ private:
                 errorLog() << "Unexpected failure in unsubscribe allocation\n";
                 subInfo.m_unsubscribed = true;
                 continue;
-            }     
+            }
 
             assert(ec == CC_Mqtt311ErrorCode_Success);
 
@@ -445,17 +443,17 @@ private:
                 errorLog() << "Unexpected failure in sending unsubscribe request";
                 subInfo.m_unsubHandle = nullptr;
                 subInfo.m_unsubscribed = true;
-            }             
+            }
         }
     }
 
-    void doDisconnectIfNeeded() 
+    void doDisconnectIfNeeded()
     {
         if (m_state.m_disconnected) {
             return;
         }
 
-        bool unsubsComplete = 
+        bool unsubsComplete =
             std::all_of(
                 m_state.m_subs.begin(), m_state.m_subs.end(),
                 [](auto& subInfo)
@@ -475,15 +473,15 @@ private:
         if (ec != CC_Mqtt311ErrorCode_Success) {
             errorLog() << "Failed to send disconnect\n";
             return;
-        }     
-    }    
+        }
+    }
 
     bool createGeneratorIfNeeded()
     {
         auto inputFile = m_opts.genInputFile();
         if (inputFile.empty()) {
             return true;
-        }        
+        }
 
         m_generator = std::make_unique<Generator>(m_logger, m_opts.minPubCount());
         if (!m_generator->prepare(inputFile)) {
@@ -521,7 +519,7 @@ private:
     static void sendOutputDataCb(void* data, const unsigned char* buf, unsigned bufLen)
     {
         auto& logger = asThis(data)->m_logger;
-        logger.infoLog() << "Sending " << bufLen << " bytes\n";    
+        logger.infoLog() << "Sending " << bufLen << " bytes\n";
         if (asThis(data)->m_verbose) {
             auto& out = logger.debugLog();
             out << "Sent bytes: " << std::hex;
@@ -558,7 +556,7 @@ private:
         if (publish == nullptr) {
             thisPtr->errorLog() << "Unexpected failure in publish allocation\n";
             return;
-        }        
+        }
 
         CC_Mqtt311PublishConfig config;
         ::cc_mqtt311_##NAME##client_publish_init_config(&config);
@@ -573,12 +571,12 @@ private:
             thisPtr->errorLog() << "Unexpected failure in publish configuration\n";
             ::cc_mqtt311_##NAME##client_publish_cancel(publish);
             return;
-        }    
+        }
 
         ec = cc_mqtt311_##NAME##client_publish_send(publish, &AflFuzzImpl::publishCompleteCb, thisPtr);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             thisPtr->errorLog() << "Failure to publish message\n";
-        }    
+        }
     }
 
     static void errorLogCb(void* data, const char* msg)
@@ -623,21 +621,21 @@ private:
 
         state.m_connectRequired = true;
         state.m_connected = false;
-        state.m_reinitRequired = true;    
-    }  
+        state.m_reinitRequired = true;
+    }
 
     static void subscribeCompleteCb(void* data, CC_Mqtt311SubscribeHandle handle, CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311SubscribeResponse* response)
     {
         auto* thisPtr = asThis(data);
         auto& state = thisPtr->m_state;
-        auto iter = 
+        auto iter =
             std::find_if(
                 state.m_subs.begin(), state.m_subs.end(),
                 [handle](auto& info)
                 {
                     return info.m_subHandle == handle;
                 });
-        
+
         if (iter == state.m_subs.end()) {
             thisPtr->errorLog() << "Unexpected handle of the subscribe completion\n";
             exit(-1);
@@ -659,16 +657,16 @@ private:
                 break;
             }
         }
-        
+
         if (allOk) {
             thisPtr->infoLog() << "The subscribe is properly acked\n";
         }
         iter->m_acked = allOk;
-    }   
+    }
 
     static void publishCompleteCb(
-        void* data, 
-        [[maybe_unused]] CC_Mqtt311PublishHandle handle, 
+        void* data,
+        [[maybe_unused]] CC_Mqtt311PublishHandle handle,
         CC_Mqtt311AsyncOpStatus status)
     {
         auto* thisPtr = asThis(data);
@@ -678,20 +676,20 @@ private:
         }
 
         ++thisPtr->m_state.m_publishCount;
-    }          
+    }
 
     static void unsubscribeCompleteCb(void* data, CC_Mqtt311UnsubscribeHandle handle, CC_Mqtt311AsyncOpStatus status)
     {
         auto* thisPtr = asThis(data);
         auto& state = thisPtr->m_state;
-        auto iter = 
+        auto iter =
             std::find_if(
                 state.m_subs.begin(), state.m_subs.end(),
                 [handle](auto& info)
                 {
                     return info.m_unsubHandle == handle;
                 });
-        
+
         if (iter == state.m_subs.end()) {
             thisPtr->errorLog() << "Unexpected handle of the unsubscribe completion\n";
             exit(-1);
@@ -706,7 +704,7 @@ private:
 
         thisPtr->infoLog() << "The unsubscribe is properly acked\n";
         iter->m_unsubscribed = true;
-    }      
+    }
 
     const ProgramOptions& m_opts;
     Logger& m_logger;
@@ -715,12 +713,12 @@ private:
     std::vector<std::uint8_t> m_inData;
     State m_state;
     bool m_verbose = false;
-}; 
+};
 
-AflFuzz::AflFuzz(const ProgramOptions& opts, Logger& logger) : 
+AflFuzz::AflFuzz(const ProgramOptions& opts, Logger& logger) :
     m_impl(std::make_unique<AflFuzzImpl>(opts, logger))
 {
-}   
+}
 
 AflFuzz::~AflFuzz() = default;
 

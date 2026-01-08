@@ -4,7 +4,7 @@ macro (cc_mqtt311_compile)
         list (APPEND compile_opts USE_CCACHE)
         if (NOT "${CC_MQTT311_CCACHE_EXECUTABLE}" STREQUAL "")
             list (APPEND compile_opts CCACHE_EXECUTABLE "${CC_MQTT311_CCACHE_EXECUTABLE}")
-        endif ()        
+        endif ()
     endif ()
 
     if (CC_MQTT311_WARN_AS_ERR)
@@ -31,7 +31,7 @@ macro (cc_mqtt311_compile)
         )
     endif ()
 
-    if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND 
+    if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND
         ("${CMAKE_CXX_STANDARD}" GREATER_EQUAL "20"))
         list (APPEND extra_flags_list
             "-Wno-tautological-constant-out-of-range-compare"

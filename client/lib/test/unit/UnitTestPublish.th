@@ -74,7 +74,6 @@ void UnitTestPublish::test1()
     auto ec = apiPublishConfig(publish, &config);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
-
     ec = unitTestSendPublish(publish);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
@@ -85,7 +84,7 @@ void UnitTestPublish::test1()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -132,7 +131,7 @@ void UnitTestPublish::test2()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -185,7 +184,7 @@ void UnitTestPublish::test3()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(!publishMsg1->transportField_flags().field_dup().getBitValue_bit());
@@ -195,9 +194,9 @@ void UnitTestPublish::test3()
     TS_ASSERT(!unitTestIsPublishComplete());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg2, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->transportField_flags().field_dup().getBitValue_bit());
 
     // Another timeout
@@ -246,7 +245,7 @@ void UnitTestPublish::test4()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT_EQUALS(static_cast<CC_Mqtt311QoS>(publishMsg->transportField_flags().field_qos().value()), Qos);
@@ -254,7 +253,6 @@ void UnitTestPublish::test4()
     TS_ASSERT_EQUALS(publishMsg->field_topic().value(), Topic);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     TS_ASSERT_EQUALS(publishMsg->field_payload().value(), Data);
-
 
     unitTestTick(client, 1000);
     UnitTestPubrecMsg pubrecMsg;
@@ -264,7 +262,7 @@ void UnitTestPublish::test4()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());
@@ -312,7 +310,7 @@ void UnitTestPublish::test5()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(!publishMsg1->transportField_flags().field_dup().getBitValue_bit());
@@ -322,9 +320,9 @@ void UnitTestPublish::test5()
     TS_ASSERT(!unitTestIsPublishComplete());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg2, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->transportField_flags().field_dup().getBitValue_bit());
 
     unitTestTick(client, 1000);
@@ -335,7 +333,7 @@ void UnitTestPublish::test5()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT(!unitTestIsPublishComplete());
@@ -345,17 +343,17 @@ void UnitTestPublish::test5()
     TS_ASSERT(!unitTestIsPublishComplete());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);   
-    TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value()); 
-    
+    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
+    TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());
+
     // Another timeout
     unitTestTick(client);
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubrespInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubrespInfo.m_status, CC_Mqtt311AsyncOpStatus_Timeout);
-    unitTestPopPublishResponseInfo();   
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test6()
@@ -379,18 +377,18 @@ void UnitTestPublish::test6()
 
     config.m_topic = "hello/#";
     ec = apiPublishConfig(publish, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
 
     config.m_topic = "$hello";
     ec = apiPublishConfig(publish, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
 
     config.m_topic = "";
     ec = apiPublishConfig(publish, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);     
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_InsufficientConfig);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_InsufficientConfig);
 }
 
 void UnitTestPublish::test7()
@@ -407,7 +405,7 @@ void UnitTestPublish::test7()
     apiPublishInitConfig(&config);
     config.m_topic = "hello/bla";
     config.m_data = &Data[0];
-    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());    
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
     config.m_qos = CC_Mqtt311QoS_AtLeastOnceDelivery;
 
     auto publish = apiPublishPrepare(client, nullptr);
@@ -417,11 +415,11 @@ void UnitTestPublish::test7()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -429,13 +427,13 @@ void UnitTestPublish::test7()
     UnitTestPubackMsg pubackMsg;
     pubackMsg.field_packetId().setValue(publishMsg->field_packetId().field().value() + 1U);
     unitTestReceiveMessage(client, pubackMsg);
-    
+
     TS_ASSERT(!unitTestIsPublishComplete());
 
     unitTestTick(client); // timeout, send second time
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->transportField_flags().field_dup().getBitValue_bit());
@@ -465,7 +463,7 @@ void UnitTestPublish::test8()
     apiPublishInitConfig(&config);
     config.m_topic = "hello/bla";
     config.m_data = &Data[0];
-    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());    
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
 
     auto publish = apiPublishPrepare(client, nullptr);
@@ -475,11 +473,11 @@ void UnitTestPublish::test8()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -488,13 +486,13 @@ void UnitTestPublish::test8()
     UnitTestPubrecMsg pubrecMsg;
     pubrecMsg.field_packetId().setValue(publishMsg->field_packetId().field().value() + 1U);
     unitTestReceiveMessage(client, pubrecMsg);
-    
+
     TS_ASSERT(!unitTestHasSentMessage());
 
     unitTestTick(client); // timeout, send second time
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->transportField_flags().field_dup().getBitValue_bit());
@@ -512,7 +510,6 @@ void UnitTestPublish::test8()
     unitTestPopPublishResponseInfo();
 }
 
-
 void UnitTestPublish::test9()
 {
     // Testing invalid packet ID in PUBCOMP
@@ -527,7 +524,7 @@ void UnitTestPublish::test9()
     apiPublishInitConfig(&config);
     config.m_topic = "hello/bla";
     config.m_data = &Data[0];
-    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());    
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
 
     auto publish = apiPublishPrepare(client, nullptr);
@@ -537,11 +534,11 @@ void UnitTestPublish::test9()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -549,10 +546,10 @@ void UnitTestPublish::test9()
     UnitTestPubrecMsg pubrecMsg;
     pubrecMsg.field_packetId().setValue(publishMsg->field_packetId().field().value());
     unitTestReceiveMessage(client, pubrecMsg);
-    
+
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());
@@ -569,7 +566,7 @@ void UnitTestPublish::test9()
     unitTestTick(client); // Retry timeout
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg2 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg2, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg2->field_packetId().value(), pubrecMsg.field_packetId().value());
@@ -602,7 +599,7 @@ void UnitTestPublish::test10()
     apiPublishInitConfig(&config);
     config.m_topic = "hello/bla";
     config.m_data = &Data[0];
-    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());    
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
     config.m_qos = CC_Mqtt311QoS_AtLeastOnceDelivery;
 
     auto publish = apiPublishPrepare(client, nullptr);
@@ -616,11 +613,11 @@ void UnitTestPublish::test10()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -650,7 +647,7 @@ void UnitTestPublish::test11()
     apiPublishInitConfig(&config);
     config.m_topic = "hello/bla";
     config.m_data = &Data[0];
-    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());    
+    config.m_dataLen = static_cast<decltype(config.m_dataLen)>(Data.size());
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
 
     auto publish = apiPublishPrepare(client, nullptr);
@@ -664,11 +661,11 @@ void UnitTestPublish::test11()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);   
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
 
@@ -685,7 +682,7 @@ void UnitTestPublish::test11()
 void UnitTestPublish::test12()
 {
     // Testing rejection of invalid QoS value
-    
+
     auto clientPtr = apiAllocClient();
     auto* client = clientPtr.get();
 
@@ -708,7 +705,7 @@ void UnitTestPublish::test12()
     TS_ASSERT_DIFFERS(publish, nullptr);
 
     auto ec = apiPublishConfig(publish, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_BadParam);
 }
 
 void UnitTestPublish::test13()
@@ -743,18 +740,18 @@ void UnitTestPublish::test13()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     auto packetId = publishMsg->field_packetId().field().value();
     TS_ASSERT_DIFFERS(packetId, 0U);
-    
+
     unitTestTick(client, 1000);
     UnitTestPubrecMsg pubrecMsg;
     pubrecMsg.field_packetId().setValue(packetId);
-   
-    unitTestReceiveMessage(client, pubrecMsg);   
+
+    unitTestReceiveMessage(client, pubrecMsg);
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_ProtocolError);
@@ -793,18 +790,18 @@ void UnitTestPublish::test14()
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     auto packetId = publishMsg->field_packetId().field().value();
     TS_ASSERT_DIFFERS(packetId, 0U);
-    
+
     unitTestTick(client, 1000);
     UnitTestPubackMsg pubackMsg;
     pubackMsg.field_packetId().setValue(packetId);
-   
-    unitTestReceiveMessage(client, pubackMsg);   
+
+    unitTestReceiveMessage(client, pubackMsg);
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_ProtocolError);
@@ -840,11 +837,11 @@ void UnitTestPublish::test15()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -860,11 +857,11 @@ void UnitTestPublish::test15()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->field_packetId().doesExist());
@@ -877,17 +874,16 @@ void UnitTestPublish::test15()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId1);
 
-
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->field_packetId().doesExist());
@@ -925,12 +921,12 @@ void UnitTestPublish::test16()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(publishMsg1->field_packetId().doesExist());
@@ -947,12 +943,12 @@ void UnitTestPublish::test16()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->field_packetId().doesExist());
@@ -965,7 +961,7 @@ void UnitTestPublish::test16()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(publishMsg1->field_packetId().doesExist());
@@ -974,7 +970,7 @@ void UnitTestPublish::test16()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
     TS_ASSERT(publishMsg2->field_packetId().doesExist());
@@ -991,7 +987,7 @@ void UnitTestPublish::test17()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic1("some/topic1");
     const UnitTestData Data = {0x1, 0x2, 0x3};
@@ -1011,11 +1007,11 @@ void UnitTestPublish::test17()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1045,9 +1041,9 @@ void UnitTestPublish::test17()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);  
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId1);
@@ -1060,7 +1056,7 @@ void UnitTestPublish::test17()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();    
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test18()
@@ -1071,7 +1067,7 @@ void UnitTestPublish::test18()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client)); 
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic1("some/topic1");
     const UnitTestData Data = {0x1, 0x2, 0x3};
@@ -1091,11 +1087,11 @@ void UnitTestPublish::test18()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1125,9 +1121,9 @@ void UnitTestPublish::test18()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);  
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().doesExist());
     TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId1);
@@ -1139,7 +1135,7 @@ void UnitTestPublish::test18()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());
@@ -1152,7 +1148,7 @@ void UnitTestPublish::test18()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();    
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test19()
@@ -1163,7 +1159,7 @@ void UnitTestPublish::test19()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client)); 
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic1("some/topic1");
     const UnitTestData Data = {0x1, 0x2, 0x3};
@@ -1183,11 +1179,11 @@ void UnitTestPublish::test19()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1200,10 +1196,10 @@ void UnitTestPublish::test19()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
-    TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());    
+    TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), pubrecMsg.field_packetId().value());
 
     unitTestTick(client, 1000);
     apiNotifyNetworkDisconnected(client);
@@ -1229,9 +1225,9 @@ void UnitTestPublish::test19()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);  
+    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), packetId1);
 
     unitTestTick(client, 1000);
@@ -1242,7 +1238,7 @@ void UnitTestPublish::test19()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();    
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test20()
@@ -1258,7 +1254,7 @@ void UnitTestPublish::test20()
     connectConfig.m_cleanSession = true;
 
     unitTestPerformConnect(client, &connectConfig, nullptr);
-    TS_ASSERT(apiIsConnected(client)); 
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic1("some/topic1");
     const UnitTestData Data = {0x1, 0x2, 0x3};
@@ -1278,11 +1274,11 @@ void UnitTestPublish::test20()
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish1);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);  
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
 
     unitTestTick(client, 1000);
     apiNotifyNetworkDisconnected(client);
@@ -1298,7 +1294,7 @@ void UnitTestPublish::test20()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo.m_status, CC_Mqtt311AsyncOpStatus_Aborted);
-    unitTestPopPublishResponseInfo();    
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test21()
@@ -1314,7 +1310,7 @@ void UnitTestPublish::test21()
     connectConfig.m_cleanSession = true;
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1331,14 +1327,14 @@ void UnitTestPublish::test21()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     auto ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1350,23 +1346,23 @@ void UnitTestPublish::test21()
 
     config.m_qos = CC_Mqtt311QoS_AtMostOnceDelivery;
     ec = apiPublishConfig(publish3, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish3);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg3 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg3, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg3, nullptr);
     TS_ASSERT(publishMsg3->field_packetId().isMissing());
-    
+
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo3 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo3.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();     
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test22()
@@ -1377,7 +1373,7 @@ void UnitTestPublish::test22()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1394,25 +1390,25 @@ void UnitTestPublish::test22()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     auto ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(publishMsg1->field_packetId().doesExist());
     auto packetId1 = publishMsg1->field_packetId().field().value();
-    
+
     auto* publish2 = apiPublishPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(publish2, nullptr);
 
     ec = apiPublishConfig(publish2, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2, false);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
@@ -1420,10 +1416,10 @@ void UnitTestPublish::test22()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
-    TS_ASSERT(publishMsg2->field_packetId().doesExist());    
+    TS_ASSERT(publishMsg2->field_packetId().doesExist());
     auto packetId2 = publishMsg2->field_packetId().field().value();
 
     // Out of order PUBACK
@@ -1435,7 +1431,7 @@ void UnitTestPublish::test22()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg3 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg3, nullptr);
     TS_ASSERT(publishMsg3->transportField_flags().field_dup().getBitValue_bit());
@@ -1445,12 +1441,12 @@ void UnitTestPublish::test22()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg4 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg4, nullptr);
     TS_ASSERT(publishMsg4->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg4->field_packetId().doesExist());
-    TS_ASSERT_EQUALS(publishMsg4->field_packetId().field().value(), packetId2);  
+    TS_ASSERT_EQUALS(publishMsg4->field_packetId().field().value(), packetId2);
 
     unitTestTick(client, 1000);
     UnitTestPubackMsg pubackMsg1;
@@ -1466,7 +1462,7 @@ void UnitTestPublish::test22()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubrespInfo2 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubrespInfo2.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();    
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test23()
@@ -1477,7 +1473,7 @@ void UnitTestPublish::test23()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1494,26 +1490,26 @@ void UnitTestPublish::test23()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     auto ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(publishMsg1->field_packetId().doesExist());
     auto packetId1 = publishMsg1->field_packetId().field().value();
-    
+
     auto* publish2 = apiPublishPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(publish2, nullptr);
 
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
     ec = apiPublishConfig(publish2, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2, false);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
@@ -1521,10 +1517,10 @@ void UnitTestPublish::test23()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
-    TS_ASSERT(publishMsg2->field_packetId().doesExist());    
+    TS_ASSERT(publishMsg2->field_packetId().doesExist());
     auto packetId2 = publishMsg2->field_packetId().field().value();
 
     // Out of order PUBREC
@@ -1536,7 +1532,7 @@ void UnitTestPublish::test23()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg3 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg3, nullptr);
     TS_ASSERT(publishMsg3->transportField_flags().field_dup().getBitValue_bit());
@@ -1546,12 +1542,12 @@ void UnitTestPublish::test23()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg4 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg4, nullptr);
     TS_ASSERT(publishMsg4->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg4->field_packetId().doesExist());
-    TS_ASSERT_EQUALS(publishMsg4->field_packetId().field().value(), packetId2);  
+    TS_ASSERT_EQUALS(publishMsg4->field_packetId().field().value(), packetId2);
 
     unitTestTick(client, 1000);
     UnitTestPubackMsg pubackMsg1;
@@ -1567,20 +1563,20 @@ void UnitTestPublish::test23()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg4 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg4, nullptr);
-    TS_ASSERT_EQUALS(pubrelMsg4->field_packetId().value(), packetId2);  
+    TS_ASSERT_EQUALS(pubrelMsg4->field_packetId().value(), packetId2);
 
     unitTestTick(client, 1000);
     UnitTestPubcompMsg pubcompMsg3;
     pubcompMsg3.field_packetId().setValue(packetId2);
-    unitTestReceiveMessage(client, pubcompMsg3);   
+    unitTestReceiveMessage(client, pubcompMsg3);
 
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubrespInfo2 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubrespInfo2.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();         
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test24()
@@ -1591,7 +1587,7 @@ void UnitTestPublish::test24()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1608,25 +1604,25 @@ void UnitTestPublish::test24()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     auto ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     TS_ASSERT(unitTestHasSentMessage());
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg1 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg1, nullptr);
     TS_ASSERT(publishMsg1->field_packetId().doesExist());
     auto packetId1 = publishMsg1->field_packetId().field().value();
-    
+
     auto* publish2 = apiPublishPrepare(client, nullptr);
     TS_ASSERT_DIFFERS(publish2, nullptr);
 
     ec = apiPublishConfig(publish2, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2, false);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
@@ -1634,10 +1630,10 @@ void UnitTestPublish::test24()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg2 = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg2, nullptr);
-    TS_ASSERT(publishMsg2->field_packetId().doesExist());    
+    TS_ASSERT(publishMsg2->field_packetId().doesExist());
     auto packetId2 = publishMsg2->field_packetId().field().value();
 
     unitTestTick(client, 1000);
@@ -1648,33 +1644,33 @@ void UnitTestPublish::test24()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg1 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg1, nullptr);
-    TS_ASSERT_EQUALS(pubrelMsg1->field_packetId().value(), packetId1);      
+    TS_ASSERT_EQUALS(pubrelMsg1->field_packetId().value(), packetId1);
 
     UnitTestPubrecMsg pubrecMsg2;
     pubrecMsg2.field_packetId().setValue(packetId2);
-    unitTestReceiveMessage(client, pubrecMsg2);    
+    unitTestReceiveMessage(client, pubrecMsg2);
 
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg2 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg2, nullptr);
-    TS_ASSERT_EQUALS(pubrelMsg2->field_packetId().value(), packetId2);        
+    TS_ASSERT_EQUALS(pubrelMsg2->field_packetId().value(), packetId2);
 
     // Out-of-order PUBCOMPS
     unitTestTick(client, 1000);
     UnitTestPubcompMsg pubcompMsg2;
     pubcompMsg2.field_packetId().setValue(packetId2);
-    unitTestReceiveMessage(client, pubcompMsg2);    
+    unitTestReceiveMessage(client, pubcompMsg2);
 
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg3 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg3, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg3->field_packetId().value(), packetId1);
@@ -1682,7 +1678,7 @@ void UnitTestPublish::test24()
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg4 = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(pubrelMsg4, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg4->field_packetId().value(), packetId2);
@@ -1690,7 +1686,7 @@ void UnitTestPublish::test24()
     unitTestTick(client, 1000);
     UnitTestPubcompMsg pubcompMsg1;
     pubcompMsg1.field_packetId().setValue(packetId1);
-    unitTestReceiveMessage(client, pubcompMsg1); 
+    unitTestReceiveMessage(client, pubcompMsg1);
 
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubrespInfo1 = unitTestPublishResponseInfo();
@@ -1701,7 +1697,7 @@ void UnitTestPublish::test24()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubrespInfo2 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubrespInfo2.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();         
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test25()
@@ -1712,10 +1708,10 @@ void UnitTestPublish::test25()
     auto* client = clientPtr.get();
     TS_ASSERT_EQUALS(apiPublishGetOrdering(client), CC_Mqtt311PublishOrdering_SameQos);
     auto ec = apiPublishSetOrdering(client, CC_Mqtt311PublishOrdering_Full);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1732,14 +1728,14 @@ void UnitTestPublish::test25()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1752,20 +1748,20 @@ void UnitTestPublish::test25()
 
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
     ec = apiPublishConfig(publish2, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     // QoS2 is sent right away
-    TS_ASSERT(unitTestHasSentMessage()); 
+    TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(!publishMsg->transportField_flags().field_dup().getBitValue_bit()); // NO DUP
-    TS_ASSERT(publishMsg->field_packetId().doesExist()); 
+    TS_ASSERT(publishMsg->field_packetId().doesExist());
     auto packetId2 = publishMsg->field_packetId().field().value();
 
     auto* publish3 = apiPublishPrepare(client, nullptr);
@@ -1773,8 +1769,8 @@ void UnitTestPublish::test25()
 
     config.m_qos = CC_Mqtt311QoS_AtMostOnceDelivery;
     ec = apiPublishConfig(publish3, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish3);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
@@ -1789,7 +1785,7 @@ void UnitTestPublish::test25()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo1 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo1.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo(); 
+    unitTestPopPublishResponseInfo();
 
     UnitTestPubrecMsg pubrecMsg;
     pubrecMsg.field_packetId().setValue(packetId2);
@@ -1797,9 +1793,9 @@ void UnitTestPublish::test25()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);    
+    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), packetId2);
     TS_ASSERT(!unitTestIsPublishComplete());
 
@@ -1810,22 +1806,22 @@ void UnitTestPublish::test25()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo2 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo2.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();   
+    unitTestPopPublishResponseInfo();
 
     // QoS0 is sent after QoS2 is complete
-    TS_ASSERT(unitTestHasSentMessage()); 
+    TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(!publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().isMissing()); // QoS0 sent
 
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo3 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo3.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();       
+    unitTestPopPublishResponseInfo();
 }
 
 void UnitTestPublish::test26()
@@ -1836,10 +1832,10 @@ void UnitTestPublish::test26()
     auto* client = clientPtr.get();
     TS_ASSERT_EQUALS(apiPublishGetOrdering(client), CC_Mqtt311PublishOrdering_SameQos);
     auto ec = apiPublishSetOrdering(client, CC_Mqtt311PublishOrdering_Full);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     const UnitTestData Data = { 0x1, 0x2, 0x3, 0x4, 0x5};
@@ -1856,14 +1852,14 @@ void UnitTestPublish::test26()
     TS_ASSERT_DIFFERS(publish1, nullptr);
 
     ec = apiPublishConfig(publish1, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish1);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     auto sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     auto* publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
     TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->field_packetId().doesExist());
@@ -1876,20 +1872,20 @@ void UnitTestPublish::test26()
 
     config.m_qos = CC_Mqtt311QoS_ExactlyOnceDelivery;
     ec = apiPublishConfig(publish2, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     ec = unitTestSendPublish(publish2);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     // QoS2 is sent right away
-    TS_ASSERT(unitTestHasSentMessage()); 
+    TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(!publishMsg->transportField_flags().field_dup().getBitValue_bit()); // NO DUP
-    TS_ASSERT(publishMsg->field_packetId().doesExist()); 
+    TS_ASSERT(publishMsg->field_packetId().doesExist());
     auto packetId2 = publishMsg->field_packetId().field().value();
 
     auto* publish3 = apiPublishPrepare(client, nullptr);
@@ -1897,8 +1893,8 @@ void UnitTestPublish::test26()
 
     config.m_qos = CC_Mqtt311QoS_AtMostOnceDelivery;
     ec = apiPublishConfig(publish3, &config);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
-    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
+
     ec = unitTestSendPublish(publish3);
     TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
@@ -1906,7 +1902,7 @@ void UnitTestPublish::test26()
     TS_ASSERT(!unitTestIsPublishComplete());
 
     apiNotifyNetworkDisconnected(client);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success); 
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_Success);
 
     unitTestClearState();
 
@@ -1919,31 +1915,31 @@ void UnitTestPublish::test26()
 
     auto connectRespConfig = UnitTestConnectResponseConfig();
     connectRespConfig.m_sessionPresent = true;
-    unitTestPerformConnect(client, &connectConfig, nullptr, &connectRespConfig);    
+    unitTestPerformConnect(client, &connectConfig, nullptr, &connectRespConfig);
 
     // Checking the QoS1 PUBLISH is present
     TS_ASSERT(!unitTestIsPublishComplete());
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);  
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().doesExist());
-    TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId1);    
+    TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId1);
 
     // Checking the QoS2 PUBLISH is present
     TS_ASSERT(!unitTestIsPublishComplete());
     TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);  
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().doesExist());
-    TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId2);        
+    TS_ASSERT_EQUALS(publishMsg->field_packetId().field().value(), packetId2);
 
     unitTestTick(client, 1000);
     UnitTestPubackMsg pubackMsg;
@@ -1953,7 +1949,7 @@ void UnitTestPublish::test26()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo1 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo1.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo(); 
+    unitTestPopPublishResponseInfo();
 
     UnitTestPubrecMsg pubrecMsg;
     pubrecMsg.field_packetId().setValue(packetId2);
@@ -1961,9 +1957,9 @@ void UnitTestPublish::test26()
 
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Pubrel);
     auto* pubrelMsg = dynamic_cast<UnitTestPubrelMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);    
+    TS_ASSERT_DIFFERS(pubrelMsg, nullptr);
     TS_ASSERT_EQUALS(pubrelMsg->field_packetId().value(), packetId2);
     TS_ASSERT(!unitTestIsPublishComplete());
 
@@ -1974,20 +1970,20 @@ void UnitTestPublish::test26()
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo2 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo2.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();   
+    unitTestPopPublishResponseInfo();
 
     // QoS0 is sent after QoS2 is complete
-    TS_ASSERT(unitTestHasSentMessage()); 
+    TS_ASSERT(unitTestHasSentMessage());
     sentMsg = unitTestGetSentMessage();
     TS_ASSERT(sentMsg);
-    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);    
+    TS_ASSERT_EQUALS(sentMsg->getId(), cc_mqtt311::MsgId_Publish);
     publishMsg = dynamic_cast<UnitTestPublishMsg*>(sentMsg.get());
-    TS_ASSERT_DIFFERS(publishMsg, nullptr);    
+    TS_ASSERT_DIFFERS(publishMsg, nullptr);
     TS_ASSERT(!publishMsg->transportField_flags().field_dup().getBitValue_bit());
     TS_ASSERT(publishMsg->field_packetId().isMissing()); // QoS0 sent
 
     TS_ASSERT(unitTestIsPublishComplete());
     auto& pubInfo3 = unitTestPublishResponseInfo();
     TS_ASSERT_EQUALS(pubInfo3.m_status, CC_Mqtt311AsyncOpStatus_Complete);
-    unitTestPopPublishResponseInfo();       
+    unitTestPopPublishResponseInfo();
 }

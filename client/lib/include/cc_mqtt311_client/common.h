@@ -54,7 +54,7 @@ typedef enum
 typedef enum
 {
     CC_Mqtt311ErrorCode_Success = 0, ///< The requested function executed successfully.
-    CC_Mqtt311ErrorCode_InternalError = 1, ///< Internal library error, please submit bug report    
+    CC_Mqtt311ErrorCode_InternalError = 1, ///< Internal library error, please submit bug report
     CC_Mqtt311ErrorCode_NotIntitialized = 2, ///< The allocated client hasn't been initialized.
     CC_Mqtt311ErrorCode_Busy = 3, ///< The client library is in the middle of previous operation(s), cannot start a new one.
     CC_Mqtt311ErrorCode_NotConnected = 4, ///< The client library is not connected to the broker. Returned by operations that require connection to the broker.
@@ -76,7 +76,7 @@ typedef enum
 typedef enum
 {
     CC_Mqtt311AsyncOpStatus_Complete = 0, ///< The requested operation has been completed, refer to reported extra details for information.
-    CC_Mqtt311AsyncOpStatus_InternalError = 1, ///< Internal library error, please submit bug report    
+    CC_Mqtt311AsyncOpStatus_InternalError = 1, ///< Internal library error, please submit bug report
     CC_Mqtt311AsyncOpStatus_Timeout = 2, ///< The required response from broker hasn't been received in time
     CC_Mqtt311AsyncOpStatus_ProtocolError = 3, ///< The broker's response doesn't comply with MQTT311 specification.
     CC_Mqtt311AsyncOpStatus_Aborted = 4, ///< The operation has been aborted before completion due to client's side operation.
@@ -109,12 +109,12 @@ typedef enum
 /// @ingroup connect
 typedef enum
 {
-    CC_Mqtt311ConnectReturnCode_Accepted = 0, ///< value <b>Connection Accepted</b>. 
-    CC_Mqtt311ConnectReturnCode_InvalidProtocolVersion = 1, ///< value <b>Invalid Protocol Version</b>. 
-    CC_Mqtt311ConnectReturnCode_IdRejected = 2, ///< value <b>Client ID is rejected</b>. 
-    CC_Mqtt311ConnectReturnCode_ServerUnavailable = 3, ///< value <b>Server is Unavailable</b>. 
-    CC_Mqtt311ConnectReturnCode_BadAuth = 4, ///< value <b>Bad authentication details</b>. 
-    CC_Mqtt311ConnectReturnCode_NotAuthorized = 5, ///< value <b>No Subscription Existed</b>. 
+    CC_Mqtt311ConnectReturnCode_Accepted = 0, ///< value <b>Connection Accepted</b>.
+    CC_Mqtt311ConnectReturnCode_InvalidProtocolVersion = 1, ///< value <b>Invalid Protocol Version</b>.
+    CC_Mqtt311ConnectReturnCode_IdRejected = 2, ///< value <b>Client ID is rejected</b>.
+    CC_Mqtt311ConnectReturnCode_ServerUnavailable = 3, ///< value <b>Server is Unavailable</b>.
+    CC_Mqtt311ConnectReturnCode_BadAuth = 4, ///< value <b>Bad authentication details</b>.
+    CC_Mqtt311ConnectReturnCode_NotAuthorized = 5, ///< value <b>No Subscription Existed</b>.
     CC_Mqtt311ConnectReturnCode_ValuesLimit ///< Upper limit of the values
 } CC_Mqtt311ConnectReturnCode;
 
@@ -122,10 +122,10 @@ typedef enum
 /// @ingroup subscribe
 typedef enum
 {
-    CC_Mqtt311SubscribeReturnCode_SuccessQos0 = 0x00, ///< value <b>Maximum QoS 0</b>. 
-    CC_Mqtt311SubscribeReturnCode_SuccessQos1 = 0x01, ///< value <b>Maximum QoS 1</b>. 
-    CC_Mqtt311SubscribeReturnCode_SuccessQos2 = 0x02, ///< value <b>Maximum QoS 2</b>. 
-    CC_Mqtt311SubscribeReturnCode_Failure = 0x80, ///< value <b>Failure</b>. 
+    CC_Mqtt311SubscribeReturnCode_SuccessQos0 = 0x00, ///< value <b>Maximum QoS 0</b>.
+    CC_Mqtt311SubscribeReturnCode_SuccessQos1 = 0x01, ///< value <b>Maximum QoS 1</b>.
+    CC_Mqtt311SubscribeReturnCode_SuccessQos2 = 0x02, ///< value <b>Maximum QoS 2</b>.
+    CC_Mqtt311SubscribeReturnCode_Failure = 0x80, ///< value <b>Failure</b>.
 } CC_Mqtt311SubscribeReturnCode;
 
 /// @brief Declaration of the hidden structure used to define @ref CC_Mqtt311ClientHandle
@@ -209,7 +209,7 @@ typedef struct
 
 /// @brief Response information from broker to "connect" request
 /// @ingroup connect
-typedef struct 
+typedef struct
 {
     CC_Mqtt311ConnectReturnCode m_returnCode; ///< "Connection Return Code" reported by the broker
     bool m_sessionPresent; ///< "Session Present" indication.
@@ -226,7 +226,7 @@ typedef struct
 
 /// @brief Response information from broker to "subscribe" request
 /// @ingroup subscribe
-typedef struct 
+typedef struct
 {
     const CC_Mqtt311SubscribeReturnCode* m_returnCodes; ///< Pointer to array contianing per-topic subscription return codes.
     unsigned m_returnCodesCount; ///< Amount of return codes in the array.
@@ -246,7 +246,7 @@ typedef struct
 {
     const char* m_topic; ///< Topic used to publish the message
     const unsigned char* m_data; ///< Pointer to the temporary buffer containin message data
-    unsigned m_dataLen; ///< Amount of data bytes 
+    unsigned m_dataLen; ///< Amount of data bytes
     CC_Mqtt311QoS m_qos; ///< QoS value used by the broker to report the message.
     bool m_retained; ///< Indication of whether the received message was "retained".
 } CC_Mqtt311MessageInfo;
@@ -332,8 +332,8 @@ typedef void (*CC_Mqtt311ConnectCompleteCb)(void* data, CC_Mqtt311AsyncOpStatus 
 /// @brief Callback used to report completion of the "subscribe" operation.
 /// @param[in] data Pointer to user data object passed as last parameter to the
 ///     @b cc_mqtt311_client_subscribe_send().
-/// @param[in] handle Handle returned by @b cc_mqtt311_client_subscribe_prepare() function. When the 
-///     callback is invoked the handle is already invalid and cannot be used in any relevant 
+/// @param[in] handle Handle returned by @b cc_mqtt311_client_subscribe_prepare() function. When the
+///     callback is invoked the handle is already invalid and cannot be used in any relevant
 ///     function invocation, but it allows end application to identify the original "subscribe" operation
 ///     and use the same callback function in parallel requests.
 /// @param[in] status Status of the "subscribe" operation.
@@ -346,8 +346,8 @@ typedef void (*CC_Mqtt311SubscribeCompleteCb)(void* data, CC_Mqtt311SubscribeHan
 /// @brief Callback used to report completion of the "unsubscribe" operation.
 /// @param[in] data Pointer to user data object passed as last parameter to the
 ///     @b cc_mqtt311_client_unsubscribe_send().
-/// @param[in] handle Handle returned by @b cc_mqtt311_client_unsubscribe_prepare() function. When the 
-///     callback is invoked the handle is already invalid and cannot be used in any relevant 
+/// @param[in] handle Handle returned by @b cc_mqtt311_client_unsubscribe_prepare() function. When the
+///     callback is invoked the handle is already invalid and cannot be used in any relevant
 ///     function invocation, but it allows end application to identify the original "unsubscribe" operation
 ///     and use the same callback function in parallel requests.
 /// @param[in] status Status of the "unsubscribe" operation.
@@ -357,8 +357,8 @@ typedef void (*CC_Mqtt311UnsubscribeCompleteCb)(void* data, CC_Mqtt311Unsubscrib
 /// @brief Callback used to report completion of the "publish" operation.
 /// @param[in] data Pointer to user data object passed as last parameter to the
 ///     @b cc_mqtt311_client_publish_send().
-/// @param[in] handle Handle returned by @b cc_mqtt311_client_publish_prepare() function. When the 
-///     callback is invoked the handle is already invalid and cannot be used in any relevant 
+/// @param[in] handle Handle returned by @b cc_mqtt311_client_publish_prepare() function. When the
+///     callback is invoked the handle is already invalid and cannot be used in any relevant
 ///     function invocation, but it allows end application to identify the original "publish" operation
 ///     and use the same callback function in parallel requests.
 /// @param[in] status Status of the "publish" operation.

@@ -60,18 +60,18 @@ public:
     void setResponseTimeout(unsigned ms)
     {
         m_responseTimeoutMs = ms;
-    }    
+    }
 
     void connectivityChanged()
     {
         connectivityChangedImpl();
     }
 
-    inline 
+    inline
     static bool verifyQosValid(Qos qos)
     {
         return (qos <= static_cast<decltype(qos)>(Config::MaxQos));
-    }    
+    }
 
 protected:
     explicit Op(ClientImpl& client);
@@ -93,7 +93,7 @@ protected:
     const ClientImpl& client() const
     {
         return m_client;
-    }    
+    }
 
     inline void errorLog(const char* msg)
     {
@@ -110,7 +110,7 @@ protected:
         else {
             return true;
         }
-    }    
+    }
 
     inline bool verifyPubTopic(const char* topic, bool outgoing)
     {
@@ -120,7 +120,7 @@ protected:
         else {
             return true;
         }
-    }     
+    }
 
     static constexpr std::size_t maxStringLen()
     {
@@ -132,7 +132,7 @@ private:
     bool verifySubFilterInternal(const char* filter);
     bool verifyPubTopicInternal(const char* topic, bool outgoing);
 
-    ClientImpl& m_client;    
+    ClientImpl& m_client;
     unsigned m_responseTimeoutMs = 0U;
 };
 

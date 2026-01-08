@@ -42,16 +42,16 @@ void UnitTestDisconnect::test1()
 
     auto* unsubscribe = apiUnsubscribePrepare(client, &ec);
     TS_ASSERT_EQUALS(unsubscribe, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);    
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
     auto* publish = apiPublishPrepare(client, &ec);
     TS_ASSERT_EQUALS(publish, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);       
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
     auto* disconnect = apiDisconnectPrepare(client, &ec);
     TS_ASSERT_EQUALS(disconnect, nullptr);
-    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);       
+    TS_ASSERT_EQUALS(ec, CC_Mqtt311ErrorCode_NotConnected);
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 }
