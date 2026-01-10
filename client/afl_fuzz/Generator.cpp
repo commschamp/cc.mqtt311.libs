@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,7 @@
 namespace cc_mqtt311_client_afl_fuzz
 {
 
-namespace 
+namespace
 {
 
 std::string pubTopicFromFilter(const std::string& filter)
@@ -30,7 +30,7 @@ std::string pubTopicFromFilter(const std::string& filter)
 
         result.append(filter.substr(pos, wildcardPos - pos));
         pos = wildcardPos + 1U;
-        
+
         if (filter[wildcardPos] == '#') {
             result.append("hash");
             pos = filter.size();
@@ -48,8 +48,7 @@ std::string pubTopicFromFilter(const std::string& filter)
     return result;
 }
 
-} // namespace 
-    
+} // namespace
 
 bool Generator::prepare(const std::string& inputFile)
 {
@@ -109,7 +108,7 @@ void Generator::handle(const Mqtt311PubrecMsg& msg)
     Mqtt311PubrelMsg outMsg;
     outMsg.field_packetId().setValue(msg.field_packetId().getValue());
     sendMessage(outMsg);
-    return;    
+    return;
 }
 
 void Generator::handle(const Mqtt311PubrelMsg& msg)
@@ -119,7 +118,7 @@ void Generator::handle(const Mqtt311PubrelMsg& msg)
     outMsg.field_packetId().setValue(msg.field_packetId().getValue());
     sendMessage(outMsg);
     doNextPublishIfNeeded();
-    return;    
+    return;
 }
 
 void Generator::handle(const Mqtt311SubscribeMsg& msg)
@@ -174,7 +173,7 @@ void Generator::sendMessage(Mqtt311Message& msg)
     [[maybe_unused]] auto es = m_frame.write(msg, iter, outBuf.max_size());
     assert(es == comms::ErrorStatus::Success);
     assert(m_dataReportCb);
-    
+
     std::ostreambuf_iterator<char> outIter(m_stream);
     std::copy(outBuf.begin(), outBuf.end(), outIter);
     m_dataReportCb(outBuf.data(), outBuf.size());
@@ -203,7 +202,7 @@ void Generator::doPublish()
     if (m_nextPubQos > 2) {
         m_nextPubQos = 0;
     }
-} 
+}
 
 void Generator::doNextPublishIfNeeded()
 {

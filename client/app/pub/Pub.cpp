@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +12,7 @@
 namespace cc_mqtt311_client_app
 {
 
-namespace 
+namespace
 {
 
 Pub* asThis(void* data)
@@ -20,10 +20,9 @@ Pub* asThis(void* data)
     return reinterpret_cast<Pub*>(data);
 }
 
-} // namespace 
-    
+} // namespace
 
-Pub::Pub(boost::asio::io_context& io, int& result) : 
+Pub::Pub(boost::asio::io_context& io, int& result) :
     Base(io, result)
 {
     opts().addCommon();
@@ -31,7 +30,7 @@ Pub::Pub(boost::asio::io_context& io, int& result) :
     opts().addTls();
     opts().addConnect();
     opts().addPublish();
-}    
+}
 
 void Pub::brokerConnectedImpl()
 {
@@ -53,7 +52,7 @@ void Pub::brokerConnectedImpl()
         logError() << "Failed to send PUBLISH message: " << toString(ec) << std::endl;
         doTerminate();
         return;
-    }    
+    }
 }
 
 void Pub::publishCompleteInternal([[maybe_unused]] CC_Mqtt311PublishHandle handle, CC_Mqtt311AsyncOpStatus status)
@@ -72,6 +71,5 @@ void Pub::publishCompleteCb(void* data, CC_Mqtt311PublishHandle handle, CC_Mqtt3
 {
     asThis(data)->publishCompleteInternal(handle, status);
 }
-
 
 } // namespace cc_mqtt311_client_app

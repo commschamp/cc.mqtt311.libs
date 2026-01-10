@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,7 +16,7 @@ namespace cc_mqtt311_client
 namespace op
 {
 
-namespace 
+namespace
 {
 
 inline SendOp* asSendOp(void* data)
@@ -24,21 +24,21 @@ inline SendOp* asSendOp(void* data)
     return reinterpret_cast<SendOp*>(data);
 }
 
-} // namespace     
+} // namespace
 
-SendOp::SendOp(ClientImpl& client) : 
+SendOp::SendOp(ClientImpl& client) :
     Base(client),
     m_responseTimer(client.timerMgr().allocTimer())
 {
     COMMS_ASSERT(m_responseTimer.isValid());
-}    
+}
 
 SendOp::~SendOp()
 {
     releasePacketId(m_pubMsg.field_packetId().field().value());
 }
 
-#if CC_MQTT311_CLIENT_MAX_QOS >= 1 
+#if CC_MQTT311_CLIENT_MAX_QOS >= 1
 void SendOp::handle([[maybe_unused]] PubackMsg& msg)
 {
     static_assert(Config::MaxQos >= 1);
@@ -47,22 +47,22 @@ void SendOp::handle([[maybe_unused]] PubackMsg& msg)
 
     m_responseTimer.cancel();
 
-    auto terminateOnExit = 
+    auto terminateOnExit =
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
                 cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
-        );      
+        );
 
     auto status = CC_Mqtt311AsyncOpStatus_ProtocolError;
 
-    auto completeOpOnExit = 
+    auto completeOpOnExit =
         comms::util::makeScopeGuard(
             [this, &status]()
             {
                 completeWithCb(status);
-            });        
+            });
 
     if (m_pubMsg.transportField_flags().field_qos().value() != Qos::AtLeastOnceDelivery) {
         errorLog("Unexpected PUBACK for Qos2 message");
@@ -72,9 +72,9 @@ void SendOp::handle([[maybe_unused]] PubackMsg& msg)
     terminateOnExit.release();
     status = CC_Mqtt311AsyncOpStatus_Complete;
 }
-#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 1 
+#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 1
 
-#if CC_MQTT311_CLIENT_MAX_QOS >= 2 
+#if CC_MQTT311_CLIENT_MAX_QOS >= 2
 void SendOp::handle(PubrecMsg& msg)
 {
     static_assert(Config::MaxQos >= 2);
@@ -86,22 +86,22 @@ void SendOp::handle(PubrecMsg& msg)
 
     m_responseTimer.cancel();
 
-    auto terminateOnExit = 
+    auto terminateOnExit =
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
                 cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
-        );      
+        );
 
     auto status = CC_Mqtt311AsyncOpStatus_ProtocolError;
 
-    auto completeOpOnExit = 
+    auto completeOpOnExit =
         comms::util::makeScopeGuard(
             [this, &status]()
             {
                 completeWithCb(status);
-            });    
+            });
 
     if (m_pubMsg.transportField_flags().field_qos().value() != Qos::ExactlyOnceDelivery) {
         errorLog("Unexpected PUBREC for Qos1 message");
@@ -120,7 +120,7 @@ void SendOp::handle(PubrecMsg& msg)
     m_sendAttempts = 0U;
     PubrelMsg pubrelMsg;
     pubrelMsg.field_packetId().setValue(m_pubMsg.field_packetId().field().value());
-    auto result = client().sendMessage(pubrelMsg); 
+    auto result = client().sendMessage(pubrelMsg);
     if (result != CC_Mqtt311ErrorCode_Success) {
         errorLog("Failed to resend PUBREL message.");
         status = CC_Mqtt311AsyncOpStatus_InternalError;
@@ -141,22 +141,22 @@ void SendOp::handle(PubcompMsg& msg)
 
     m_responseTimer.cancel();
 
-    auto terminateOnExit = 
+    auto terminateOnExit =
         comms::util::makeScopeGuard(
             [&cl = client()]()
             {
                 cl.brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             }
-        );      
+        );
 
     auto status = CC_Mqtt311AsyncOpStatus_ProtocolError;
 
-    auto completeOpOnExit = 
+    auto completeOpOnExit =
         comms::util::makeScopeGuard(
             [this, &status]()
             {
                 completeWithCb(status);
-            });  
+            });
 
     if (m_pubMsg.transportField_flags().field_qos().value() != Qos::ExactlyOnceDelivery) {
         errorLog("Unexpected PUBCOMP for Qos1 message");
@@ -166,7 +166,7 @@ void SendOp::handle(PubcompMsg& msg)
     if (!m_acked) {
         errorLog("Unexpected PUBCOMP without PUBREC");
         return;
-    }    
+    }
 
     terminateOnExit.release();
     status = CC_Mqtt311AsyncOpStatus_Complete;
@@ -203,7 +203,7 @@ CC_Mqtt311ErrorCode SendOp::config(const CC_Mqtt311PublishConfig& config)
     if (maxStringLen() < dataVec.size()) {
         errorLog("Publish data value is too long");
         return CC_Mqtt311ErrorCode_BadParam;
-    }      
+    }
 
     return CC_Mqtt311ErrorCode_Success;
 }
@@ -227,8 +227,8 @@ unsigned SendOp::getResendAttempts() const
 CC_Mqtt311ErrorCode SendOp::send(CC_Mqtt311PublishCompleteCb cb, void* cbData)
 {
     client().allowNextPrepare();
-    
-    auto completeOnExit = 
+
+    auto completeOnExit =
         comms::util::makeScopeGuard(
             [this]()
             {
@@ -238,7 +238,7 @@ CC_Mqtt311ErrorCode SendOp::send(CC_Mqtt311PublishCompleteCb cb, void* cbData)
     if (!m_responseTimer.isValid()) {
         errorLog("The library cannot allocate required number of timers.");
         return CC_Mqtt311ErrorCode_InternalError;
-    }    
+    }
 
     if (m_pubMsg.field_topic().value().empty()) {
         errorLog("Topic hasn't been properly configured, cannot publish");
@@ -292,7 +292,7 @@ void SendOp::postReconnectionResend()
     COMMS_ASSERT(m_sendAttempts > 0U);
     --m_sendAttempts;
     m_responseTimer.cancel();
-    resendDupMsg(); 
+    resendDupMsg();
 }
 
 void SendOp::forceDupResend()
@@ -301,7 +301,7 @@ void SendOp::forceDupResend()
         return;
     }
 
-    resendDupMsg(); 
+    resendDupMsg();
 }
 
 bool SendOp::resume()
@@ -372,7 +372,7 @@ void SendOp::resendDupMsg()
     COMMS_ASSERT(m_published);
     if (!m_acked) {
         m_pubMsg.transportField_flags().field_dup().setBitValue_bit(true);
-        auto result = client().sendMessage(m_pubMsg); 
+        auto result = client().sendMessage(m_pubMsg);
         if (result != CC_Mqtt311ErrorCode_Success) {
             errorLog("Failed to resend PUBLISH message.");
             completeWithCb(CC_Mqtt311AsyncOpStatus_InternalError);
@@ -387,7 +387,7 @@ void SendOp::resendDupMsg()
     COMMS_ASSERT(m_pubMsg.transportField_flags().field_qos().value() == Qos::ExactlyOnceDelivery);
     PubrelMsg pubrelMsg;
     pubrelMsg.field_packetId().setValue(m_pubMsg.field_packetId().field().value());
-    auto result = client().sendMessage(pubrelMsg); 
+    auto result = client().sendMessage(pubrelMsg);
     if (result != CC_Mqtt311ErrorCode_Success) {
         errorLog("Failed to resend PUBREL message.");
         completeWithCb(CC_Mqtt311AsyncOpStatus_InternalError);
@@ -416,7 +416,7 @@ void SendOp::completeWithCb(CC_Mqtt311AsyncOpStatus status)
 CC_Mqtt311ErrorCode SendOp::doSendInternal()
 {
     m_sendAttempts = 0U;
-    auto result = client().sendMessage(m_pubMsg); 
+    auto result = client().sendMessage(m_pubMsg);
     if (result != CC_Mqtt311ErrorCode_Success) {
         return result;
     }

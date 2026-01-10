@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,10 +16,10 @@ namespace cc_mqtt311_client
 namespace op
 {
 
-namespace 
+namespace
 {
 
-using TopicStr = PublishMsg::Field_topic::ValueType;    
+using TopicStr = PublishMsg::Field_topic::ValueType;
 
 inline RecvOp* asRecvOp(void* data)
 {
@@ -39,14 +39,14 @@ bool isTopicMatch(std::string_view filter, std::string_view topic)
     auto filterSepPos = filter.find_first_of("/");
     auto topicSepPos = topic.find_first_of("/");
 
-    if ((filterSepPos == std::string_view::npos) && 
+    if ((filterSepPos == std::string_view::npos) &&
         (topicSepPos != std::string_view::npos)) {
         return false;
     }
 
     if (topicSepPos != std::string_view::npos) {
         COMMS_ASSERT(filterSepPos != std::string_view::npos);
-        if (((filter[0] == '+') && (filterSepPos == 1U)) || 
+        if (((filter[0] == '+') && (filterSepPos == 1U)) ||
             (filter.substr(0, filterSepPos) == topic.substr(0, topicSepPos))) {
             return isTopicMatch(filter.substr(filterSepPos + 1U), topic.substr(topicSepPos + 1U));
         }
@@ -61,7 +61,7 @@ bool isTopicMatch(std::string_view filter, std::string_view topic)
             return false;
         }
 
-        if (((filter[0] == '+') && (filterSepPos == 1U)) || 
+        if (((filter[0] == '+') && (filterSepPos == 1U)) ||
             (filter.substr(0, filterSepPos) == topic)) {
             return isTopicMatch(filter.substr(filterSepPos + 1U), std::string_view());
         }
@@ -72,8 +72,8 @@ bool isTopicMatch(std::string_view filter, std::string_view topic)
     COMMS_ASSERT(filterSepPos == std::string_view::npos);
     COMMS_ASSERT(topicSepPos == std::string_view::npos);
 
-    return 
-        (((filter[0] == '+') && (filter.size() == 1U)) || 
+    return
+        (((filter[0] == '+') && (filter.size() == 1U)) ||
          (filter == topic));
 }
 
@@ -84,14 +84,14 @@ bool isTopicMatch(const TopicFilterStr& filter, const TopicStr& topic)
     return isTopicMatch(std::string_view(filter.c_str(), filter.size()), std::string_view(topic.c_str(), topic.size()));
 }
 
-} // namespace     
+} // namespace
 
-RecvOp::RecvOp(ClientImpl& client) : 
+RecvOp::RecvOp(ClientImpl& client) :
     Base(client),
     m_responseTimer(client.timerMgr().allocTimer())
 {
     COMMS_ASSERT(m_responseTimer.isValid());
-}    
+}
 
 void RecvOp::handle(PublishMsg& msg)
 {
@@ -100,21 +100,20 @@ void RecvOp::handle(PublishMsg& msg)
     if (qos > Qos::ExactlyOnceDelivery) {
         errorLog("Received PUBLISH with unknown Qos value.");
         client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
-        return;         
+        return;
     }
-
 
     if (!verifyQosValid(qos)) {
         errorLog("Invalid QoS in PUBLISH from broker");
         client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
         return;
-    }    
+    }
 
     if constexpr (Config::MaxQos >= 2) {
-        if ((qos == Qos::ExactlyOnceDelivery) && 
-            (m_packetId != 0U) && 
+        if ((qos == Qos::ExactlyOnceDelivery) &&
+            (m_packetId != 0U) &&
             (msg.field_packetId().doesExist())) {
-            
+
             if (msg.field_packetId().field().value() != m_packetId) {
                 // Applicable to other RecvOp being handled in parallel
                 return;
@@ -148,7 +147,7 @@ void RecvOp::handle(PublishMsg& msg)
     if constexpr (Config::HasSubTopicVerification) {
         if (client().configState().m_verifySubFilter) {
             auto& subFilters = client().reuseState().m_subFilters;
-            auto iter = 
+            auto iter =
                 std::find_if(
                     subFilters.begin(), subFilters.end(),
                     [&topic](auto& filter)
@@ -159,10 +158,10 @@ void RecvOp::handle(PublishMsg& msg)
             if (iter == subFilters.end()) {
                 errorLog("Received PUBLISH on non-subscribed topic");
                 client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
-                return;                
+                return;
             }
         }
-    }  
+    }
 
     auto info = CC_Mqtt311MessageInfo();
     info.m_topic = topic.c_str();
@@ -187,18 +186,17 @@ void RecvOp::handle(PublishMsg& msg)
             COMMS_ASSERT(ProtocolDecodingError);
             client().brokerDisconnected(CC_Mqtt311BrokerDisconnectReason_ProtocolError);
             return;
-        }    
+        }
 
         client().reportMsgInfo(info);
 
-    
         if (qos == Qos::AtLeastOnceDelivery) {
             PubackMsg pubackMsg;
             pubackMsg.field_packetId().value() = msg.field_packetId().field().value();
             sendMessage(pubackMsg);
             opComplete();
             return;
-        }    
+        }
     }
 
     if constexpr (Config::MaxQos >= 2) {
@@ -235,7 +233,7 @@ void RecvOp::handle(PubrelMsg& msg)
 
 void RecvOp::resetTimer()
 {
-    if constexpr (Config::MaxQos >= 2) {    
+    if constexpr (Config::MaxQos >= 2) {
         m_responseTimer.cancel();
     }
 }
@@ -263,10 +261,10 @@ void RecvOp::connectivityChangedImpl()
 
 void RecvOp::restartResponseTimer()
 {
-    if constexpr (Config::MaxQos >= 2) {    
+    if constexpr (Config::MaxQos >= 2) {
         auto& state = client().configState();
         m_responseTimer.wait(state.m_responseTimeoutMs, &RecvOp::recvTimeoutCb, this);
-    }        
+    }
 }
 
 void RecvOp::responseTimeoutInternal()

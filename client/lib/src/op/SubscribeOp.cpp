@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,14 +16,14 @@ namespace cc_mqtt311_client
 namespace op
 {
 
-namespace 
+namespace
 {
 
 template <typename TField, bool THasFixedLength>
 struct ReturnCodesCountHeper
 {
     static constexpr unsigned Value = 0U;
-};  
+};
 
 template <typename TField>
 struct ReturnCodesCountHeper<TField, true>
@@ -42,13 +42,13 @@ constexpr unsigned returnCodesLength()
     return ReturnCodesCountHeper<TField, TField::hasFixedSize()>::Value;
 }
 
-} // namespace     
+} // namespace
 
-SubscribeOp::SubscribeOp(ClientImpl& client) : 
+SubscribeOp::SubscribeOp(ClientImpl& client) :
     Base(client),
     m_timer(client.timerMgr().allocTimer())
 {
-}  
+}
 
 SubscribeOp::~SubscribeOp()
 {
@@ -69,7 +69,7 @@ CC_Mqtt311ErrorCode SubscribeOp::configTopic(const CC_Mqtt311SubscribeTopicConfi
 
     if (static_cast<decltype(config.m_maxQos)>(Config::MaxQos) < config.m_maxQos) {
         errorLog("Bad subscription qos value.");
-        return CC_Mqtt311ErrorCode_BadParam;        
+        return CC_Mqtt311ErrorCode_BadParam;
     }
 
     auto& topicVec = m_subMsg.field_list().value();
@@ -87,16 +87,16 @@ CC_Mqtt311ErrorCode SubscribeOp::configTopic(const CC_Mqtt311SubscribeTopicConfi
         errorLog("Subscription topic value is too long");
         topicVec.pop_back();
         return CC_Mqtt311ErrorCode_BadParam;
-    }   
+    }
 
     return CC_Mqtt311ErrorCode_Success;
 }
 
-CC_Mqtt311ErrorCode SubscribeOp::send(CC_Mqtt311SubscribeCompleteCb cb, void* cbData) 
+CC_Mqtt311ErrorCode SubscribeOp::send(CC_Mqtt311SubscribeCompleteCb cb, void* cbData)
 {
     client().allowNextPrepare();
-    
-    auto completeOnError = 
+
+    auto completeOnError =
         comms::util::makeScopeGuard(
             [this]()
             {
@@ -116,13 +116,13 @@ CC_Mqtt311ErrorCode SubscribeOp::send(CC_Mqtt311SubscribeCompleteCb cb, void* cb
     if (!m_timer.isValid()) {
         errorLog("The library cannot allocate required number of timers.");
         return CC_Mqtt311ErrorCode_InternalError;
-    }    
+    }
 
     m_cb = cb;
     m_cbData = cbData;
 
     m_subMsg.field_packetId().setValue(allocPacketId());
-    auto result = client().sendMessage(m_subMsg); 
+    auto result = client().sendMessage(m_subMsg);
     if (result != CC_Mqtt311ErrorCode_Success) {
         return result;
     }
@@ -158,7 +158,7 @@ void SubscribeOp::handle(SubackMsg& msg)
     ReturnCodesList returnCodes; // Will be referenced in response
     auto response = CC_Mqtt311SubscribeResponse();
 
-    auto terminateOnExit = 
+    auto terminateOnExit =
         comms::util::makeScopeGuard(
             [&cl = client(), &status]()
             {
@@ -168,9 +168,9 @@ void SubscribeOp::handle(SubackMsg& msg)
                 }
                 cl.brokerDisconnected(reason);
             }
-        );    
+        );
 
-    auto completeOpOnExit = 
+    auto completeOpOnExit =
         comms::util::makeScopeGuard(
             [this, &status, &response]()
             {
@@ -179,7 +179,7 @@ void SubscribeOp::handle(SubackMsg& msg)
                     responsePtr = nullptr;
                 }
                 completeOpInternal(status, responsePtr);
-            });     
+            });
 
     auto& topicsVec = m_subMsg.field_list().value();
     auto& returnCodesVec = msg.field_list().value();
@@ -199,10 +199,10 @@ void SubscribeOp::handle(SubackMsg& msg)
             return;
         }
 
-        // Without this condition it can be unexpected behaviour to 
+        // Without this condition it can be unexpected behaviour to
         // cast return code value to CC_Mqtt311SubscribeReturnCode.
         using RetCodeType = SubackMsg::Field_list::ValueType::value_type::ValueType;
-        if ((RetCodeType::Qos2 < rc.value()) && 
+        if ((RetCodeType::Qos2 < rc.value()) &&
             (RetCodeType::Failure != rc.value())) {
             errorLog("Invalid return code in SUBACK");
             return;
@@ -210,15 +210,15 @@ void SubscribeOp::handle(SubackMsg& msg)
 
         auto rcCasted = static_cast<CC_Mqtt311SubscribeReturnCode>(rc.value());
 
-        if ((CC_Mqtt311SubscribeReturnCode_SuccessQos0 <= rcCasted) && 
+        if ((CC_Mqtt311SubscribeReturnCode_SuccessQos0 <= rcCasted) &&
             (rcCasted <= CC_Mqtt311SubscribeReturnCode_SuccessQos2)) {
             auto ackQos = static_cast<unsigned>(rcCasted) - static_cast<unsigned>(CC_Mqtt311SubscribeReturnCode_SuccessQos0);
             auto reqQos = static_cast<unsigned>(topicsVec[idx].field_qos().value());
             if (reqQos < ackQos) {
                 errorLog("Granted QoS in SUBACK is greater than requested");
                 return; // protocol error will be reported
-            }   
-        } 
+            }
+        }
         else if (rcCasted != CC_Mqtt311SubscribeReturnCode_Failure) {
             errorLog("Return code in SUBACK has invalid value");
             return; // protocol error will be reported
@@ -234,11 +234,11 @@ void SubscribeOp::handle(SubackMsg& msg)
             if (returnCodes.back() >  CC_Mqtt311SubscribeReturnCode_SuccessQos2) {
                 // Subscribe is not confirmed
                 continue;
-            }            
-            
+            }
+
             auto& topicStr = m_subMsg.field_list().value()[idx].field_topic().value();
             auto& filtersMap = client().reuseState().m_subFilters;
-            auto iter = 
+            auto iter =
                 std::lower_bound(
                     filtersMap.begin(), filtersMap.end(), topicStr,
                     [](auto& storedTopic, auto& topicParam)
@@ -286,7 +286,7 @@ void SubscribeOp::completeOpInternal(CC_Mqtt311AsyncOpStatus status, const CC_Mq
     auto handle = toHandle();
     opComplete(); // mustn't access data members after destruction
     if (cb != nullptr) {
-        cb(cbData, handle, status, response);    
+        cb(cbData, handle, status, response);
     }
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -77,8 +77,8 @@ public:
     CC_Mqtt311PublishOrdering getPublishOrdering() const
     {
         return m_configState.m_publishOrdering;
-    }    
-    
+    }
+
     std::size_t sendsCount() const
     {
         return m_sendOps.size();
@@ -120,7 +120,7 @@ public:
     {
         if (cb != nullptr) {
             m_messageReceivedReportCb = cb;
-            m_messageReceivedReportData = data;            
+            m_messageReceivedReportData = data;
         }
     }
 
@@ -135,9 +135,9 @@ public:
     using Base::handle;
     virtual void handle(PublishMsg& msg) override;
 
-#if CC_MQTT311_CLIENT_MAX_QOS >= 1    
+#if CC_MQTT311_CLIENT_MAX_QOS >= 1
     virtual void handle(PubackMsg& msg) override;
-#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 1    
+#endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 1
 
 #if CC_MQTT311_CLIENT_MAX_QOS >= 2
     virtual void handle(PubrecMsg& msg) override;
@@ -153,7 +153,7 @@ public:
     void opComplete(const op::Op* op);
     void brokerConnected(bool sessionPresent);
     void brokerDisconnected(
-        CC_Mqtt311BrokerDisconnectReason reason = CC_Mqtt311BrokerDisconnectReason_ValuesLimit,  
+        CC_Mqtt311BrokerDisconnectReason reason = CC_Mqtt311BrokerDisconnectReason_ValuesLimit,
         CC_Mqtt311AsyncOpStatus status = CC_Mqtt311AsyncOpStatus_BrokerDisconnected);
     void reportMsgInfo(const CC_Mqtt311MessageInfo& info);
     bool hasPausedSendsBefore(const op::SendOp* sendOp) const;
@@ -178,12 +178,12 @@ public:
     ClientState& clientState()
     {
         return m_clientState;
-    }    
+    }
 
     const ClientState& clientState() const
     {
         return m_clientState;
-    }       
+    }
 
     SessionState& sessionState()
     {
@@ -193,12 +193,12 @@ public:
     const SessionState& sessionState() const
     {
         return m_sessionState;
-    }    
+    }
 
     ReuseState& reuseState()
     {
         return m_reuseState;
-    }    
+    }
 
     inline void errorLog(const char* msg)
     {
@@ -210,8 +210,8 @@ public:
     // std::size_t recvsCount() const
     // {
     //     return m_recvOps.size();
-    // }    
-    
+    // }
+
 private:
     using ConnectOpAlloc = ObjAllocator<op::ConnectOp, ExtConfig::ConnectOpsLimit>;
     using ConnectOpsList = ObjListType<ConnectOpAlloc::Ptr, ExtConfig::ConnectOpsLimit>;
@@ -281,7 +281,7 @@ private:
     void* m_brokerDisconnectReportData = nullptr;
 
     CC_Mqtt311MessageReceivedReportCb m_messageReceivedReportCb = nullptr;
-    void* m_messageReceivedReportData = nullptr;      
+    void* m_messageReceivedReportData = nullptr;
 
     CC_Mqtt311ErrorLogCb m_errorLogCb = nullptr;
     void* m_errorLogData = nullptr;

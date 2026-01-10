@@ -27,7 +27,7 @@ void UnitTestBmPublish::test1()
     auto* client = clientPtr.get();
 
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     const std::string Topic("some/topic");
     auto* publish = apiPublishPrepare(client, nullptr);

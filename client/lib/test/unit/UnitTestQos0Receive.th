@@ -27,7 +27,7 @@ void UnitTestQos0Receive::test1()
     auto clientPtr = apiAllocClient();
     auto* client = clientPtr.get();
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     auto subscribeConfig = CC_Mqtt311SubscribeTopicConfig();
     apiSubscribeInitConfigTopic(&subscribeConfig);
@@ -49,10 +49,10 @@ void UnitTestQos0Receive::test1()
     publishMsg.doRefresh();
     unitTestReceiveMessage(client, publishMsg);
 
-    TS_ASSERT(unitTestHasDisconnectInfo());      
+    TS_ASSERT(unitTestHasDisconnectInfo());
     auto& disconnectInfo = unitTestDisconnectInfo();
     TS_ASSERT_EQUALS(disconnectInfo.m_reason, CC_Mqtt311BrokerDisconnectReason_ProtocolError);
-    unitTestPopDisconnectInfo();       
+    unitTestPopDisconnectInfo();
 }
 
 void UnitTestQos0Receive::test2()
@@ -61,7 +61,7 @@ void UnitTestQos0Receive::test2()
     auto clientPtr = apiAllocClient();
     auto* client = clientPtr.get();
     unitTestPerformBasicConnect(client, __FUNCTION__);
-    TS_ASSERT(apiIsConnected(client));    
+    TS_ASSERT(apiIsConnected(client));
 
     auto subscribeConfig = CC_Mqtt311SubscribeTopicConfig();
     apiSubscribeInitConfigTopic(&subscribeConfig);
@@ -83,8 +83,8 @@ void UnitTestQos0Receive::test2()
     publishMsg.doRefresh();
     unitTestReceiveMessage(client, publishMsg);
 
-    TS_ASSERT(unitTestHasDisconnectInfo());      
+    TS_ASSERT(unitTestHasDisconnectInfo());
     auto& disconnectInfo = unitTestDisconnectInfo();
     TS_ASSERT_EQUALS(disconnectInfo.m_reason, CC_Mqtt311BrokerDisconnectReason_ProtocolError);
-    unitTestPopDisconnectInfo();      
+    unitTestPopDisconnectInfo();
 }

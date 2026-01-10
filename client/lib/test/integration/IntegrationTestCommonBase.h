@@ -16,7 +16,7 @@ class IntegrationTestCommonBase
         {
             ::cc_mqtt311_client_free(ptr);
         }
-    }; 
+    };
 
 public:
     using ClientPtr = std::unique_ptr<CC_Mqtt311Client, ClientDeleter>;
@@ -61,12 +61,11 @@ public:
         return m_clientId;
     }
 
-
 protected:
     virtual unsigned integrationTestGetTimeoutSecImpl();
     virtual void integrationTestTimeoutImpl();
-    virtual void integrationTestBrokerDisconnectedImpl();    
-    virtual void integrationTestMessageReceivedImpl(const CC_Mqtt311MessageInfo* info);    
+    virtual void integrationTestBrokerDisconnectedImpl();
+    virtual void integrationTestMessageReceivedImpl(const CC_Mqtt311MessageInfo* info);
     virtual void integrationTestConnectCompleteImpl(CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311ConnectResponse* response);
     virtual void integrationTestSubscribeCompleteImpl(CC_Mqtt311SubscribeHandle handle, CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311SubscribeResponse* response);
     virtual void integrationTestPublishCompleteImpl(CC_Mqtt311PublishHandle handle, CC_Mqtt311AsyncOpStatus status);
@@ -76,7 +75,7 @@ protected:
 private:
     void integrationTestDoReadInternal();
     void integrationTestDoTestTimeoutInternal();
-    void integrationTestBrokerDisconnectedInternal(CC_Mqtt311BrokerDisconnectReason reason);    
+    void integrationTestBrokerDisconnectedInternal(CC_Mqtt311BrokerDisconnectReason reason);
     void integrationTestMessageReceivedInternal(const CC_Mqtt311MessageInfo* info);
     void integrationTestConnectCompleteInternal(CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311ConnectResponse* response);
     void integrationTestSubscribeCompleteInternal(CC_Mqtt311SubscribeHandle handle, CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311SubscribeResponse* response);

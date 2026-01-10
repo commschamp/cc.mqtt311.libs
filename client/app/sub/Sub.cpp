@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Sublic
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +12,7 @@
 namespace cc_mqtt311_client_app
 {
 
-namespace 
+namespace
 {
 
 Sub* asThis(void* data)
@@ -20,10 +20,9 @@ Sub* asThis(void* data)
     return reinterpret_cast<Sub*>(data);
 }
 
-} // namespace 
-    
+} // namespace
 
-Sub::Sub(boost::asio::io_context& io, int& result) : 
+Sub::Sub(boost::asio::io_context& io, int& result) :
     Base(io, result)
 {
     opts().addCommon();
@@ -31,7 +30,7 @@ Sub::Sub(boost::asio::io_context& io, int& result) :
     opts().addTls();
     opts().addConnect();
     opts().addSubscribe();
-}    
+}
 
 void Sub::brokerConnectedImpl()
 {
@@ -48,7 +47,7 @@ void Sub::brokerConnectedImpl()
 
     for (auto idx = 0U; idx < topics.size(); ++idx) {
         auto topicConfig = CC_Mqtt311SubscribeTopicConfig();
-        ::cc_mqtt311_client_subscribe_init_config_topic(&topicConfig);        
+        ::cc_mqtt311_client_subscribe_init_config_topic(&topicConfig);
         topicConfig.m_topic = topics[idx].c_str();
 
         if (idx < qoses.size()) {
@@ -60,7 +59,7 @@ void Sub::brokerConnectedImpl()
             logError() << "Failed to configure topic \"" << topics[idx] << "\": " << toString(ec) << std::endl;
             doTerminate();
             return;
-        }        
+        }
     }
 
     ec = ::cc_mqtt311_client_subscribe_send(subscribe, &Sub::subscribeCompleteCb, this);
@@ -68,7 +67,7 @@ void Sub::brokerConnectedImpl()
         logError() << "Failed to send SUBSCRIBE message: " << toString(ec) << std::endl;
         doTerminate();
         return;
-    }        
+    }
 }
 
 void Sub::messageReceivedImpl(const CC_Mqtt311MessageInfo* info)
@@ -81,15 +80,15 @@ void Sub::messageReceivedImpl(const CC_Mqtt311MessageInfo* info)
 
     if (opts().verbose()) {
         print(*info);
-    }   
+    }
     else {
         std::cout << info->m_topic << ": " << toString(info->m_data, info->m_dataLen, opts().subBinary()) << std::endl;
     }
 }
 
 void Sub::subscribeCompleteInternal(
-    [[maybe_unused]] CC_Mqtt311SubscribeHandle handle, 
-    CC_Mqtt311AsyncOpStatus status, 
+    [[maybe_unused]] CC_Mqtt311SubscribeHandle handle,
+    CC_Mqtt311AsyncOpStatus status,
     const CC_Mqtt311SubscribeResponse* response)
 {
     if (status != CC_Mqtt311AsyncOpStatus_Complete) {
@@ -110,15 +109,14 @@ void Sub::subscribeCompleteInternal(
 
     if (opts().verbose()) {
         print(*response);
-    }    
+    }
 
-    // Listening to the messages    
+    // Listening to the messages
 }
 
 void Sub::subscribeCompleteCb(void* data, CC_Mqtt311SubscribeHandle handle, CC_Mqtt311AsyncOpStatus status, const CC_Mqtt311SubscribeResponse* response)
 {
     asThis(data)->subscribeCompleteInternal(handle, status, response);
 }
-
 
 } // namespace cc_mqtt311_client_app

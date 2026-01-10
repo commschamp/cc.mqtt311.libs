@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,7 +20,7 @@ void ProgramOptions::addCommon()
     opts.add_options()
         ("help,h", "Display help message")
         ("verbose,v", "Verbose output")
-    ;    
+    ;
 
     m_desc.add(opts);
 }
@@ -34,12 +34,12 @@ void ProgramOptions::addConnect()
         ("password", po::value<std::string>()->default_value(std::string()), "Password, use \"\\x\" prefix to specify hexadecimal value of a single byte.")
         ("keep-alive", po::value<unsigned>()->default_value(60), "Keep alive period in seconds.")
         ("will-topic", po::value<std::string>()->default_value(std::string()), "Will topic.")
-        ("will-msg", po::value<std::string>()->default_value(std::string()), 
+        ("will-msg", po::value<std::string>()->default_value(std::string()),
             "Will message data, use \"\\x\" prefix to specify hexadecimal value of a single byte."
             "Applicable only if will-topic is set.")
-        ("will-qos", po::value<unsigned>()->default_value(0U), "Will Message QoS: 0, 1, or 2")            
-        ("will-retain", "Set \"retain\" flag on the will message.")            
-    ;    
+        ("will-qos", po::value<unsigned>()->default_value(0U), "Will Message QoS: 0, 1, or 2")
+        ("will-retain", "Set \"retain\" flag on the will message.")
+    ;
 
     m_desc.add(opts);
 }
@@ -50,15 +50,14 @@ void ProgramOptions::addNetwork(std::uint16_t port)
     opts.add_options()
         ("broker,b", po::value<std::string>()->default_value("127.0.0.1"), "Broker address to connect to")
         ("port,p", po::value<std::uint16_t>()->default_value(port), "Network port")
-    ;    
+    ;
 
     m_desc.add(opts);
 }
 
-
 void ProgramOptions::addTls()
 {
-#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL    
+#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL
     po::options_description opts("TLS Options");
     opts.add_options()
         ("tls", "Enable TLS encryption")
@@ -66,10 +65,10 @@ void ProgramOptions::addTls()
         ("tls-key", po::value<std::string>()->default_value(std::string()), "Path to the private key file (PEM)")
         ("tls-key-pass", po::value<std::string>()->default_value(std::string()), "Private key password")
         ("tls-cert", po::value<std::string>()->default_value(std::string()), "Path to the certificate file (PEM)")
-    ;    
+    ;
 
     m_desc.add(opts);
-#endif     
+#endif
 }
 
 void ProgramOptions::addPublish()
@@ -81,7 +80,7 @@ void ProgramOptions::addPublish()
             "such as \"\\x01\\xb9\\xaf\".")
         ("pub-qos,q", po::value<unsigned>()->default_value(0U), "Publish QoS: 0, 1, or 2")
         ("pub-retain", po::value<bool>()->default_value(false), "Retain the publish message")
-    ;    
+    ;
 
     m_desc.add(opts);
 }
@@ -93,9 +92,9 @@ void ProgramOptions::addSubscribe()
         ("sub-topic,t", po::value<StringsList>(), "Subscribe topic filter. Can be used multiple times.")
         ("sub-qos,q", po::value<UnsignedsList>(), "Subscribe max QoS: 0, 1, or 2. Defaults to 2. Can be used multiple times "
             "(for each topic filter correspondingly).")
-        ("sub-no-retained", "Ignore retained messages")       
+        ("sub-no-retained", "Ignore retained messages")
         ("sub-binary", "Force binary output of the received message data")
-    ;    
+    ;
 
     m_desc.add(opts);
 }
@@ -108,7 +107,7 @@ void ProgramOptions::printHelp()
 bool ProgramOptions::parseArgs(int argc, const char* argv[])
 {
     po::store(po::parse_command_line(argc, argv, m_desc), m_vm);
-    po::notify(m_vm);  
+    po::notify(m_vm);
 
     return true;
 }
@@ -125,11 +124,11 @@ bool ProgramOptions::verbose() const
 
 ProgramOptions::ConnectionType ProgramOptions::connectionType() const
 {
-#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL    
+#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL
     if (isTls()) {
         return ConnectionType_Tls;
     }
-#endif // #ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL  
+#endif // #ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL
 
     return ConnectionType_Tcp;
 }
@@ -146,11 +145,11 @@ std::uint16_t ProgramOptions::networkPort() const
 
 bool ProgramOptions::isTls() const
 {
-#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL    
+#ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL
     return m_vm.count("tls") > 0U;
 #else
     return false;
-#endif // #ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL        
+#endif // #ifdef CC_MQTT311_CLIENT_APP_HAS_OPENSSL
 }
 
 std::string ProgramOptions::tlsCa() const
@@ -262,7 +261,7 @@ ProgramOptions::UnsignedsList ProgramOptions::subQoses() const
         result = m_vm[id].as<UnsignedsList>();
     }
 
-    return result;    
+    return result;
 }
 
 bool ProgramOptions::subNoRetained() const
@@ -282,7 +281,7 @@ ProgramOptions::StringsList ProgramOptions::stringListOpts(const std::string& na
         result = m_vm[name].as<StringsList>();
     }
 
-    return result;    
+    return result;
 }
 
 } // namespace cc_mqtt311_client_app

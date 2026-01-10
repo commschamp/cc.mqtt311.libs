@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,13 +18,13 @@
 namespace cc_mqtt311_client
 {
 
-namespace 
+namespace
 {
 
 template <typename TList>
 unsigned eraseFromList(const op::Op* op, TList& list)
 {
-    auto iter = 
+    auto iter =
         std::find_if(
             list.begin(), list.end(),
             [op](auto& opPtr)
@@ -49,7 +49,7 @@ void updateEc(CC_Mqtt311ErrorCode* ec, CC_Mqtt311ErrorCode val)
     }
 }
 
-} // namespace 
+} // namespace
 
 ClientImpl::ClientImpl() = default;
 
@@ -58,7 +58,6 @@ ClientImpl::~ClientImpl()
     COMMS_ASSERT(m_apiEnterCount == 0U);
     terminateOps(CC_Mqtt311AsyncOpStatus_Aborted, TerminateMode_AbortSendRecvOps);
 }
-
 
 void ClientImpl::tick(unsigned ms)
 {
@@ -72,13 +71,13 @@ unsigned ClientImpl::processData(const std::uint8_t* iter, unsigned len)
 {
     auto guard = apiEnter();
     COMMS_ASSERT(!m_clientState.m_networkDisconnected);
-    
+
     if (m_clientState.m_networkDisconnected) {
         errorLog("Incoming data when network is disconnected");
         return 0U;
     }
 
-    auto disconnectOnExitGuard = 
+    auto disconnectOnExitGuard =
         comms::util::makeScopeGuard(
             [this]()
             {
@@ -108,7 +107,7 @@ unsigned ClientImpl::processData(const std::uint8_t* iter, unsigned len)
 
         if (es != comms::ErrorStatus::Success) {
             return len; // Disconnect
-        }        
+        }
 
         iterTmp = iter;
         ProtFrame::MsgPtr msg;
@@ -129,7 +128,7 @@ unsigned ClientImpl::processData(const std::uint8_t* iter, unsigned len)
     }
 
     disconnectOnExitGuard.release();
-    return consumed;    
+    return consumed;
 }
 
 void ClientImpl::notifyNetworkDisconnected()
@@ -139,7 +138,7 @@ void ClientImpl::notifyNetworkDisconnected()
     if (m_sessionState.m_disconnecting) {
         return; // No need to go through broker disconnection
     }
-    
+
     brokerDisconnected();
 }
 
@@ -147,7 +146,6 @@ bool ClientImpl::isNetworkDisconnected() const
 {
     return m_clientState.m_networkDisconnected;
 }
-
 
 op::ConnectOp* ClientImpl::connectPrepare(CC_Mqtt311ErrorCode* ec)
 {
@@ -168,7 +166,7 @@ op::ConnectOp* ClientImpl::connectPrepare(CC_Mqtt311ErrorCode* ec)
                 break;
             }
         }
-                
+
         if (!m_connectOps.empty()) {
             // Already allocated
             errorLog("Another connect operation is in progress.");
@@ -186,7 +184,7 @@ op::ConnectOp* ClientImpl::connectPrepare(CC_Mqtt311ErrorCode* ec)
             errorLog("Client is already connected.");
             updateEc(ec, CC_Mqtt311ErrorCode_AlreadyConnected);
             break;
-        }        
+        }
 
         if (m_ops.max_size() <= m_ops.size()) {
             errorLog("Cannot start connect operation, retry in next event loop iteration.");
@@ -196,7 +194,7 @@ op::ConnectOp* ClientImpl::connectPrepare(CC_Mqtt311ErrorCode* ec)
 
         if (m_preparationLocked) {
             errorLog("Another operation is being prepared, cannot prepare \"connect\" without \"send\" or \"cancel\" of the previous.");
-            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);            
+            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);
             break;
         }
 
@@ -231,7 +229,7 @@ op::DisconnectOp* ClientImpl::disconnectPrepare(CC_Mqtt311ErrorCode* ec)
             errorLog("Another disconnect operation is in progress.");
             updateEc(ec, CC_Mqtt311ErrorCode_Busy);
             break;
-        }        
+        }
 
         if (m_sessionState.m_disconnecting) {
             errorLog("Session disconnection is in progress, cannot initiate disconnection.");
@@ -242,20 +240,20 @@ op::DisconnectOp* ClientImpl::disconnectPrepare(CC_Mqtt311ErrorCode* ec)
         if (m_clientState.m_networkDisconnected) {
             errorLog("Network is disconnected.");
             updateEc(ec, CC_Mqtt311ErrorCode_NetworkDisconnected);
-            break;            
-        }        
+            break;
+        }
 
         if (m_ops.max_size() <= m_ops.size()) {
             errorLog("Cannot start disconnect operation, retry in next event loop iteration.");
             updateEc(ec, CC_Mqtt311ErrorCode_RetryLater);
             break;
-        }   
+        }
 
         if (m_preparationLocked) {
             errorLog("Another operation is being prepared, cannot prepare \"disconnect\" without \"send\" or \"cancel\" of the previous.");
-            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);            
+            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);
             break;
-        }            
+        }
 
         auto ptr = m_disconnectOpsAlloc.alloc(*this);
         if (!ptr) {
@@ -293,20 +291,20 @@ op::SubscribeOp* ClientImpl::subscribePrepare(CC_Mqtt311ErrorCode* ec)
         if (m_clientState.m_networkDisconnected) {
             errorLog("Network is disconnected.");
             updateEc(ec, CC_Mqtt311ErrorCode_NetworkDisconnected);
-            break;            
-        }        
+            break;
+        }
 
         if (m_ops.max_size() <= m_ops.size()) {
             errorLog("Cannot start subscribe operation, retry in next event loop iteration.");
             updateEc(ec, CC_Mqtt311ErrorCode_RetryLater);
             break;
-        }  
+        }
 
         if (m_preparationLocked) {
             errorLog("Another operation is being prepared, cannot prepare \"subscribe\" without \"send\" or \"cancel\" of the previous.");
-            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);            
+            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);
             break;
-        }            
+        }
 
         auto ptr = m_subscribeOpsAlloc.alloc(*this);
         if (!ptr) {
@@ -344,20 +342,20 @@ op::UnsubscribeOp* ClientImpl::unsubscribePrepare(CC_Mqtt311ErrorCode* ec)
         if (m_clientState.m_networkDisconnected) {
             errorLog("Network is disconnected.");
             updateEc(ec, CC_Mqtt311ErrorCode_NetworkDisconnected);
-            break;            
-        }        
+            break;
+        }
 
         if (m_ops.max_size() <= m_ops.size()) {
             errorLog("Cannot start subscribe operation, retry in next event loop iteration.");
             updateEc(ec, CC_Mqtt311ErrorCode_RetryLater);
             break;
-        }    
+        }
 
         if (m_preparationLocked) {
             errorLog("Another operation is being prepared, cannot prepare \"unsubscribe\" without \"send\" or \"cancel\" of the previous.");
-            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);            
+            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);
             break;
-        }             
+        }
 
         auto ptr = m_unsubscribeOpsAlloc.alloc(*this);
         if (!ptr) {
@@ -395,14 +393,14 @@ op::SendOp* ClientImpl::publishPrepare(CC_Mqtt311ErrorCode* ec)
         if (m_clientState.m_networkDisconnected) {
             errorLog("Network is disconnected.");
             updateEc(ec, CC_Mqtt311ErrorCode_NetworkDisconnected);
-            break;            
-        }        
+            break;
+        }
 
         if (m_ops.max_size() <= m_ops.size()) {
             errorLog("Cannot start publish operation, retry in next event loop iteration.");
             updateEc(ec, CC_Mqtt311ErrorCode_RetryLater);
             break;
-        }        
+        }
 
         auto ptr = m_sendOpsAlloc.alloc(*this);
         if (!ptr) {
@@ -413,9 +411,9 @@ op::SendOp* ClientImpl::publishPrepare(CC_Mqtt311ErrorCode* ec)
 
         if (m_preparationLocked) {
             errorLog("Another operation is being prepared, cannot prepare \"unsubscribe\" without \"send\" or \"cancel\" of the previous.");
-            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);            
+            updateEc(ec, CC_Mqtt311ErrorCode_PreparationLocked);
             break;
-        }          
+        }
 
         m_preparationLocked = true;
         m_ops.push_back(ptr.get());
@@ -446,16 +444,16 @@ void ClientImpl::handle(PublishMsg& msg)
 
     for (auto& opPtr : m_keepAliveOps) {
         msg.dispatch(*opPtr);
-    }       
+    }
 
     do {
-        auto createRecvOp = 
+        auto createRecvOp =
             [this, &msg]()
             {
                 auto ptr = m_recvOpsAlloc.alloc(*this);
                 if (!ptr) {
                     errorLog("Failed to allocate handling op for the incoming PUBLISH message, ignoring.");
-                    return; 
+                    return;
                 }
 
                 m_ops.push_back(ptr.get());
@@ -465,14 +463,14 @@ void ClientImpl::handle(PublishMsg& msg)
 
         using Qos = op::Op::Qos;
         auto qos = msg.transportField_flags().field_qos().value();
-        if ((qos == Qos::AtMostOnceDelivery) || 
+        if ((qos == Qos::AtMostOnceDelivery) ||
             (qos == Qos::AtLeastOnceDelivery)) {
             createRecvOp();
             break;
         }
 
         if constexpr (Config::MaxQos >= 2) {
-            auto iter = 
+            auto iter =
                 std::find_if(
                     m_recvOps.begin(), m_recvOps.end(),
                     [&msg](auto& opPtr)
@@ -482,7 +480,7 @@ void ClientImpl::handle(PublishMsg& msg)
 
             if (iter == m_recvOps.end()) {
                 createRecvOp();
-                break;            
+                break;
             }
 
             PubrecMsg pubrecMsg;
@@ -514,7 +512,7 @@ void ClientImpl::handle(PubackMsg& msg)
     static_assert(Config::MaxQos >= 1);
     if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
         errorLog("PUBACK with unknown packet id");
-    }    
+    }
 }
 #endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 1
 
@@ -524,7 +522,7 @@ void ClientImpl::handle(PubrecMsg& msg)
     static_assert(Config::MaxQos >= 2);
     if (!processPublishAckMsg(msg, msg.field_packetId().value(), false)) {
         errorLog("PUBREC with unknown packet id");
-    }       
+    }
 }
 
 void ClientImpl::handle(PubrelMsg& msg)
@@ -534,7 +532,7 @@ void ClientImpl::handle(PubrelMsg& msg)
         msg.dispatch(*opPtr);
     }
 
-    auto iter = 
+    auto iter =
         std::find_if(
             m_recvOps.begin(), m_recvOps.end(),
             [&msg](auto& opPtr)
@@ -556,7 +554,7 @@ void ClientImpl::handle(PubcompMsg& msg)
     static_assert(Config::MaxQos >= 2);
     if (!processPublishAckMsg(msg, msg.field_packetId().value(), true)) {
         errorLog("PUBCOMP with unknown packet id");
-    }    
+    }
 }
 
 #endif // #if CC_MQTT311_CLIENT_MAX_QOS >= 2
@@ -569,7 +567,7 @@ void ClientImpl::handle(ProtMessage& msg)
 
     // During the dispatch to callbacks can be called and new ops issues,
     // the m_ops vector can be resized and iterators invalidated.
-    // As the result, the iteration needs to be performed using indices 
+    // As the result, the iteration needs to be performed using indices
     // instead of iterators.
     // Also do not dispatch the message to new ops.
     auto count = m_ops.size();
@@ -587,7 +585,7 @@ void ClientImpl::handle(ProtMessage& msg)
         // Don't continue iteration
         if (m_sessionState.m_disconnecting) {
             break;
-        }    
+        }
     }
 }
 
@@ -663,14 +661,14 @@ void ClientImpl::brokerConnected(bool sessionPresent)
         if (sessionPresent) {
             for (auto& sendOpPtr : m_sendOps) {
                 sendOpPtr->postReconnectionResend();
-            }  
+            }
 
             for (auto& recvOpPtr : m_recvOps) {
                 recvOpPtr->postReconnectionResume();
-            }    
+            }
 
-            auto resumeUntilIdx = m_sendOps.size(); 
-            auto resumeFromIdx = resumeUntilIdx; 
+            auto resumeUntilIdx = m_sendOps.size();
+            auto resumeFromIdx = resumeUntilIdx;
             for (auto count = resumeUntilIdx; count > 0U; --count) {
                 auto idx = count - 1U;
                 auto& sendOpPtr = m_sendOps[idx];
@@ -683,7 +681,7 @@ void ClientImpl::brokerConnected(bool sessionPresent)
 
             if (resumeFromIdx < resumeUntilIdx) {
                 resumeSendOpsSince(static_cast<unsigned>(resumeFromIdx));
-            }            
+            }
 
             break;
         }
@@ -691,7 +689,7 @@ void ClientImpl::brokerConnected(bool sessionPresent)
         // Old stored session, terminate pending ops
         for (auto* op : m_ops) {
             auto opType = op->type();
-            if ((opType != op::Op::Type::Type_Send) && 
+            if ((opType != op::Op::Type::Type_Send) &&
                 (opType != op::Op::Type::Type_Recv)) {
                 continue;
             }
@@ -700,24 +698,24 @@ void ClientImpl::brokerConnected(bool sessionPresent)
         }
     } while (false);
 
-    createKeepAliveOpIfNeeded();    
+    createKeepAliveOpIfNeeded();
 }
 
 void ClientImpl::brokerDisconnected(
-    CC_Mqtt311BrokerDisconnectReason reason, 
+    CC_Mqtt311BrokerDisconnectReason reason,
     CC_Mqtt311AsyncOpStatus status)
 {
     m_clientState.m_initialized = false; // Require re-initialization
     m_sessionState.m_connected = false;
 
     m_sessionState.m_disconnecting = true;
-    terminateOps(status, TerminateMode_KeepSendRecvOps);    
+    terminateOps(status, TerminateMode_KeepSendRecvOps);
 
     for (auto* op : m_ops) {
         if (op != nullptr) {
             op->connectivityChanged();
         }
-    } 
+    }
 
     if (reason < CC_Mqtt311BrokerDisconnectReason_ValuesLimit) {
         COMMS_ASSERT(m_brokerDisconnectReportCb != nullptr);
@@ -733,7 +731,7 @@ void ClientImpl::reportMsgInfo(const CC_Mqtt311MessageInfo& info)
 
 bool ClientImpl::hasPausedSendsBefore(const op::SendOp* sendOp) const
 {
-    auto riter = 
+    auto riter =
         std::find_if(
             m_sendOps.rbegin(), m_sendOps.rend(),
             [sendOp](auto& opPtr)
@@ -827,7 +825,7 @@ void ClientImpl::createKeepAliveOpIfNeeded()
     if (!ptr) {
         COMMS_ASSERT(false); // Should not happen
         return;
-    }    
+    }
 
     m_ops.push_back(ptr.get());
     m_keepAliveOps.push_back(std::move(ptr));
@@ -891,12 +889,12 @@ CC_Mqtt311ErrorCode ClientImpl::initInternal()
         return CC_Mqtt311ErrorCode_NotIntitialized;
     }
 
-    bool hasTimerCallbacks = 
+    bool hasTimerCallbacks =
         (m_nextTickProgramCb != nullptr) ||
         (m_cancelNextTickWaitCb != nullptr);
 
     if (hasTimerCallbacks) {
-        bool hasAllTimerCallbacks = 
+        bool hasAllTimerCallbacks =
             (m_nextTickProgramCb != nullptr) &&
             (m_cancelNextTickWaitCb != nullptr);
 
@@ -919,8 +917,8 @@ void ClientImpl::resumeSendOpsSince(unsigned idx)
         if (!opToResumePtr->isPaused()) {
             ++idx;
             continue;
-        }         
-        
+        }
+
         if (!opToResumePtr->resume()) {
             break;
         }
@@ -931,7 +929,7 @@ void ClientImpl::resumeSendOpsSince(unsigned idx)
 
 op::SendOp* ClientImpl::findSendOp(std::uint16_t packetId)
 {
-    auto iter = 
+    auto iter =
         std::find_if(
             m_sendOps.begin(), m_sendOps.end(),
             [packetId](auto& opPtr)
@@ -986,7 +984,7 @@ void ClientImpl::resendAllUntil(op::SendOp* sendOp)
 
         auto* opAfterResend = sendOpPtr.get();
         if (opBeforeResend != opAfterResend) {
-            // The op object was destructed and erased, 
+            // The op object was destructed and erased,
             // do not increment index;
             continue;
         }
@@ -999,7 +997,7 @@ bool ClientImpl::processPublishAckMsg(ProtMessage& msg, std::uint16_t packetId, 
 {
     for (auto& opPtr : m_keepAliveOps) {
         msg.dispatch(*opPtr);
-    }     
+    }
 
     auto* sendOp = findSendOp(packetId);
     if (sendOp == nullptr) {
@@ -1008,7 +1006,7 @@ bool ClientImpl::processPublishAckMsg(ProtMessage& msg, std::uint16_t packetId, 
 
     if (isLegitSendAck(sendOp, pubcompAck)) {
         msg.dispatch(*sendOp);
-        return true;        
+        return true;
     }
 
     resendAllUntil(sendOp);

@@ -1,5 +1,5 @@
 //
-// Copyright 2024 - 2025 (C). Alex Robenko. All rights reserved.
+// Copyright 2024 - 2026 (C). Alex Robenko. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -92,7 +92,7 @@ inline CC_Mqtt311PublishHandle handleFromSendOp(cc_mqtt311_client::op::SendOp* o
 CC_Mqtt311ClientHandle cc_mqtt311_##NAME##client_alloc()
 {
     auto client = getClientAllocator().alloc();
-    return handleFromClient(client.release());    
+    return handleFromClient(client.release());
 }
 
 void cc_mqtt311_##NAME##client_free(CC_Mqtt311ClientHandle handle)
@@ -146,7 +146,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_outgoing_topic_enabled(
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }  
+    }
 
     if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
         clientFromHandle(handle)->configState().m_verifyOutgoingTopic = enabled;
@@ -172,7 +172,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_topic_enabled(
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }  
+    }
 
     if constexpr (cc_mqtt311_client::Config::HasTopicFormatVerification) {
         clientFromHandle(handle)->configState().m_verifyIncomingTopic = enabled;
@@ -198,7 +198,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_set_verify_incoming_msg_subscribed
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }  
+    }
 
     if constexpr (cc_mqtt311_client::Config::HasSubTopicVerification) {
         clientFromHandle(handle)->configState().m_verifySubFilter = enabled;
@@ -225,7 +225,7 @@ CC_Mqtt311ConnectHandle cc_mqtt311_##NAME##client_connect_prepare(CC_Mqtt311Clie
     if (handle == nullptr) {
         if (ec != nullptr) {
             *ec = CC_Mqtt311ErrorCode_BadParam;
-        }        
+        }
         return nullptr;
     }
 
@@ -275,7 +275,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_config_will(CC_Mqtt311Conn
 {
     if ((handle == nullptr) || (config == nullptr)) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
     return connectOpFromHandle(handle)->configWill(*config);
 }
@@ -293,16 +293,16 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect_cancel(CC_Mqtt311ConnectHa
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
-    return connectOpFromHandle(handle)->cancel();       
+    return connectOpFromHandle(handle)->cancel();
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311ConnectConfig* config,
     const CC_Mqtt311ConnectWillConfig* willConfig,
-    CC_Mqtt311ConnectCompleteCb cb, 
+    CC_Mqtt311ConnectCompleteCb cb,
     void* cbData)
 {
     auto ec = CC_Mqtt311ErrorCode_Success;
@@ -311,12 +311,12 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect(
         return ec;
     }
 
-    auto cancelOnExitGuard = 
+    auto cancelOnExitGuard =
         comms::util::makeScopeGuard(
             [connect]()
             {
                 [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_connect_cancel(connect);
-            });    
+            });
 
     if (config != nullptr) {
         ec = cc_mqtt311_##NAME##client_connect_config(connect, config);
@@ -329,7 +329,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_connect(
         ec = cc_mqtt311_##NAME##client_connect_config_will(connect, willConfig);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             return ec;
-        }        
+        }
     }
 
     cancelOnExitGuard.release();
@@ -350,18 +350,18 @@ CC_Mqtt311DisconnectHandle cc_mqtt311_##NAME##client_disconnect_prepare(CC_Mqtt3
     if (handle == nullptr) {
         if (ec != nullptr) {
             *ec = CC_Mqtt311ErrorCode_BadParam;
-        }        
+        }
         return nullptr;
     }
 
-    return handleFromDisconnectOp(clientFromHandle(handle)->disconnectPrepare(ec));    
+    return handleFromDisconnectOp(clientFromHandle(handle)->disconnectPrepare(ec));
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_send(CC_Mqtt311DisconnectHandle handle)
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }  
+    }
 
     return disconnectOpFromHandle(handle)->send();
 }
@@ -370,9 +370,9 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect_cancel(CC_Mqtt311Discon
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
-    return disconnectOpFromHandle(handle)->cancel();       
+    return disconnectOpFromHandle(handle)->cancel();
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect(CC_Mqtt311ClientHandle handle)
@@ -383,7 +383,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_disconnect(CC_Mqtt311ClientHandle 
         return ec;
     }
 
-    return cc_mqtt311_##NAME##client_disconnect_send(disconnect);    
+    return cc_mqtt311_##NAME##client_disconnect_send(disconnect);
 }
 
 CC_Mqtt311SubscribeHandle cc_mqtt311_##NAME##client_subscribe_prepare(CC_Mqtt311ClientHandle handle, CC_Mqtt311ErrorCode* ec)
@@ -391,11 +391,11 @@ CC_Mqtt311SubscribeHandle cc_mqtt311_##NAME##client_subscribe_prepare(CC_Mqtt311
     if (handle == nullptr) {
         if (ec != nullptr) {
             *ec = CC_Mqtt311ErrorCode_BadParam;
-        }        
+        }
         return nullptr;
     }
 
-    return handleFromSubscribeOp(clientFromHandle(handle)->subscribePrepare(ec));    
+    return handleFromSubscribeOp(clientFromHandle(handle)->subscribePrepare(ec));
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_set_response_timeout(CC_Mqtt311SubscribeHandle handle, unsigned ms)
@@ -438,23 +438,23 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_send(CC_Mqtt311Subscribe
         return CC_Mqtt311ErrorCode_BadParam;
     }
 
-    return subscribeOpFromHandle(handle)->send(cb, cbData);    
+    return subscribeOpFromHandle(handle)->send(cb, cbData);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe_cancel(CC_Mqtt311SubscribeHandle handle)
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
-    return subscribeOpFromHandle(handle)->cancel();       
+    return subscribeOpFromHandle(handle)->cancel();
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311SubscribeTopicConfig* topicConfigs,
     unsigned topicConfigsCount,
-    CC_Mqtt311SubscribeCompleteCb cb, 
+    CC_Mqtt311SubscribeCompleteCb cb,
     void* cbData)
 {
     auto ec = CC_Mqtt311ErrorCode_Success;
@@ -463,12 +463,12 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_subscribe(
         return ec;
     }
 
-    auto cancelOnExitGuard = 
+    auto cancelOnExitGuard =
         comms::util::makeScopeGuard(
             [subscribe]()
             {
                 [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_subscribe_cancel(subscribe);
-            });  
+            });
 
     COMMS_ASSERT((topicConfigsCount == 0U) || (topicConfigs != nullptr));
     for (auto idx = 0U; idx < topicConfigsCount; ++idx) {
@@ -488,11 +488,11 @@ CC_Mqtt311UnsubscribeHandle cc_mqtt311_##NAME##client_unsubscribe_prepare(CC_Mqt
     if (handle == nullptr) {
         if (ec != nullptr) {
             *ec = CC_Mqtt311ErrorCode_BadParam;
-        }        
+        }
         return nullptr;
     }
 
-    return handleFromUnsubscribeOp(clientFromHandle(handle)->unsubscribePrepare(ec)); 
+    return handleFromUnsubscribeOp(clientFromHandle(handle)->unsubscribePrepare(ec));
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_set_response_timeout(CC_Mqtt311UnsubscribeHandle handle, unsigned ms)
@@ -502,7 +502,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_set_response_timeout(C
     }
 
     unsubscribeOpFromHandle(handle)->setResponseTimeout(ms);
-    return CC_Mqtt311ErrorCode_Success;    
+    return CC_Mqtt311ErrorCode_Success;
 }
 
 unsigned cc_mqtt311_##NAME##client_unsubscribe_get_response_timeout(CC_Mqtt311UnsubscribeHandle handle)
@@ -525,7 +525,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_config_topic(CC_Mqtt31
         return CC_Mqtt311ErrorCode_BadParam;
     }
 
-    return unsubscribeOpFromHandle(handle)->configTopic(*config);    
+    return unsubscribeOpFromHandle(handle)->configTopic(*config);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_send(CC_Mqtt311UnsubscribeHandle handle, CC_Mqtt311UnsubscribeCompleteCb cb, void* cbData)
@@ -534,14 +534,14 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_send(CC_Mqtt311Unsubsc
         return CC_Mqtt311ErrorCode_BadParam;
     }
 
-    return unsubscribeOpFromHandle(handle)->send(cb, cbData);      
+    return unsubscribeOpFromHandle(handle)->send(cb, cbData);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe_cancel(CC_Mqtt311UnsubscribeHandle handle)
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
     return unsubscribeOpFromHandle(handle)->cancel();
 }
@@ -550,7 +550,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311UnsubscribeTopicConfig* topicConfigs,
     unsigned topicConfigsCount,
-    CC_Mqtt311UnsubscribeCompleteCb cb, 
+    CC_Mqtt311UnsubscribeCompleteCb cb,
     void* cbData)
 {
     auto ec = CC_Mqtt311ErrorCode_Success;
@@ -559,12 +559,12 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_unsubscribe(
         return ec;
     }
 
-    auto cancelOnExitGuard = 
+    auto cancelOnExitGuard =
         comms::util::makeScopeGuard(
             [unsubscribe]()
             {
                 [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_unsubscribe_cancel(unsubscribe);
-            });  
+            });
 
     COMMS_ASSERT((topicConfigsCount == 0U) || (topicConfigs != nullptr));
     for (auto idx = 0U; idx < topicConfigsCount; ++idx) {
@@ -584,18 +584,18 @@ CC_Mqtt311PublishHandle cc_mqtt311_##NAME##client_publish_prepare(CC_Mqtt311Clie
     if (handle == nullptr) {
         if (ec != nullptr) {
             *ec = CC_Mqtt311ErrorCode_BadParam;
-        }        
+        }
         return nullptr;
     }
 
-    return handleFromSendOp(clientFromHandle(handle)->publishPrepare(ec));     
+    return handleFromSendOp(clientFromHandle(handle)->publishPrepare(ec));
 }
 
 unsigned cc_mqtt311_##NAME##client_publish_count(CC_Mqtt311ClientHandle handle)
 {
     if (handle == nullptr) {
         return 0U;
-    }    
+    }
 
     return static_cast<unsigned>(clientFromHandle(handle)->sendsCount());
 }
@@ -612,7 +612,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_response_timeout(CC_Mq
     }
 
     sendOpFromHandle(handle)->setResponseTimeout(ms);
-    return CC_Mqtt311ErrorCode_Success;       
+    return CC_Mqtt311ErrorCode_Success;
 }
 
 unsigned cc_mqtt311_##NAME##client_publish_get_response_timeout(CC_Mqtt311PublishHandle handle)
@@ -647,7 +647,7 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_config(CC_Mqtt311PublishHa
     if ((handle == nullptr) || (config == nullptr)) {
         return CC_Mqtt311ErrorCode_BadParam;
     }
-    
+
     return sendOpFromHandle(handle)->config(*config);
 }
 
@@ -655,16 +655,16 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_send(CC_Mqtt311PublishHand
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
-    return sendOpFromHandle(handle)->send(cb, cbData);         
+    return sendOpFromHandle(handle)->send(cb, cbData);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_cancel(CC_Mqtt311PublishHandle handle)
 {
     if (handle == nullptr) {
         return CC_Mqtt311ErrorCode_BadParam;
-    }    
+    }
 
     return sendOpFromHandle(handle)->cancel();
 }
@@ -673,7 +673,7 @@ bool cc_mqtt311_##NAME##client_publish_was_initiated(CC_Mqtt311PublishHandle han
 {
     if (handle == nullptr) {
         return false;
-    }    
+    }
 
     return sendOpFromHandle(handle)->isPublished();
 }
@@ -681,7 +681,7 @@ bool cc_mqtt311_##NAME##client_publish_was_initiated(CC_Mqtt311PublishHandle han
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
     CC_Mqtt311ClientHandle handle,
     const CC_Mqtt311PublishConfig* config,
-    CC_Mqtt311PublishCompleteCb cb, 
+    CC_Mqtt311PublishCompleteCb cb,
     void* cbData)
 {
     auto ec = CC_Mqtt311ErrorCode_Success;
@@ -690,22 +690,22 @@ CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish(
         return ec;
     }
 
-    auto cancelOnExitGuard = 
+    auto cancelOnExitGuard =
         comms::util::makeScopeGuard(
             [publish]()
             {
                 [[maybe_unused]] auto ecTmp = cc_mqtt311_##NAME##client_publish_cancel(publish);
-            });  
+            });
 
     if (config != nullptr) {
         ec = cc_mqtt311_##NAME##client_publish_config(publish, config);
         if (ec != CC_Mqtt311ErrorCode_Success) {
             return ec;
-        }        
+        }
     }
 
     cancelOnExitGuard.release();
-    return cc_mqtt311_##NAME##client_publish_send(publish, cb, cbData);    
+    return cc_mqtt311_##NAME##client_publish_send(publish, cb, cbData);
 }
 
 CC_Mqtt311ErrorCode cc_mqtt311_##NAME##client_publish_set_ordering(CC_Mqtt311ClientHandle handle, CC_Mqtt311PublishOrdering ordering)
@@ -721,7 +721,7 @@ CC_Mqtt311PublishOrdering cc_mqtt311_##NAME##client_publish_get_ordering(CC_Mqtt
 {
     if (handle == nullptr) {
         return CC_Mqtt311PublishOrdering_ValuesLimit;
-    }   
+    }
 
      return clientFromHandle(handle)->getPublishOrdering();
 }
