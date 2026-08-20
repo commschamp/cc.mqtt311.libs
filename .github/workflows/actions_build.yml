@@ -80,7 +80,6 @@ jobs:
       shell: bash
       run: ctest -V
 
-jobs:
   build_gcc_ubuntu_26_04:
     runs-on: ubuntu-26.04
     strategy:
