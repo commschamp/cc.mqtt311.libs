@@ -225,7 +225,6 @@ jobs:
         cpp: [17, 20, 23]
         sanitize: [ON, OFF]
         exclude:
-        exclude:
           - type: Debug
             sanitize: OFF
           - cc_ver: 17
