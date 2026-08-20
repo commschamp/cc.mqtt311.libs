@@ -210,7 +210,7 @@ function (gen_lib_mqtt311_client config_file)
         ${lib_name} PROPERTIES
         VERSION "${CC_MQTT311_CLIENT_VERSION}"
         SOVERSION "${major_ver}.${minor_ver}"
-    )      
+    )
 
     write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${lib_name}ConfigVersion.cmake
